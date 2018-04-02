@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1161173B2072A878009676C9 /* TextFieldCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1161173A2072A878009676C9 /* TextFieldCollectionViewCell.swift */; };
 		118B6DF12056AD8D00B1CC70 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 118B6DF02056AD8D00B1CC70 /* AppDelegate.swift */; };
 		118B6DF62056AD8D00B1CC70 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 118B6DF42056AD8D00B1CC70 /* Main.storyboard */; };
 		118B6DF82056AD8D00B1CC70 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 118B6DF72056AD8D00B1CC70 /* Assets.xcassets */; };
@@ -20,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1161173A2072A878009676C9 /* TextFieldCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldCollectionViewCell.swift; sourceTree = "<group>"; };
 		118B6DED2056AD8D00B1CC70 /* EmojiArt.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EmojiArt.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		118B6DF02056AD8D00B1CC70 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		118B6DF52056AD8D00B1CC70 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -64,12 +66,11 @@
 		118B6DEF2056AD8D00B1CC70 /* EmojiArt */ = {
 			isa = PBXGroup;
 			children = (
+				1161173A2072A878009676C9 /* TextFieldCollectionViewCell.swift */,
 				118B6E052056AE3600B1CC70 /* EmojiArtView.swift */,
-				11AC104220599B270027F8F2 /* EmojiArtGestures.swift */,
 				118B6E032056ADCB00B1CC70 /* EmojiArtViewController.swift */,
 				11AC1040205866170027F8F2 /* EmojiCollectionViewCell.swift */,
 				118B6E092056DA3500B1CC70 /* EmojiArtDocumentTableViewController.swift */,
-				118B6E072056B2A000B1CC70 /* Utilities.swift */,
 				118B6DF42056AD8D00B1CC70 /* Main.storyboard */,
 				118B6E022056AD9C00B1CC70 /* Supporting Files */,
 				118B6DFC2056AD8D00B1CC70 /* Info.plist */,
@@ -81,6 +82,8 @@
 			isa = PBXGroup;
 			children = (
 				118B6DF02056AD8D00B1CC70 /* AppDelegate.swift */,
+				11AC104220599B270027F8F2 /* EmojiArtGestures.swift */,
+				118B6E072056B2A000B1CC70 /* Utilities.swift */,
 				118B6DF72056AD8D00B1CC70 /* Assets.xcassets */,
 				118B6DF92056AD8D00B1CC70 /* LaunchScreen.storyboard */,
 			);
@@ -114,7 +117,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0920;
-				LastUpgradeCheck = 0920;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = Alexander;
 				TargetAttributes = {
 					118B6DEC2056AD8D00B1CC70 = {
@@ -163,6 +166,7 @@
 				11AC1041205866170027F8F2 /* EmojiCollectionViewCell.swift in Sources */,
 				118B6E042056ADCB00B1CC70 /* EmojiArtViewController.swift in Sources */,
 				118B6E082056B2A000B1CC70 /* Utilities.swift in Sources */,
+				1161173B2072A878009676C9 /* TextFieldCollectionViewCell.swift in Sources */,
 				118B6E0A2056DA3500B1CC70 /* EmojiArtDocumentTableViewController.swift in Sources */,
 				118B6E062056AE3600B1CC70 /* EmojiArtView.swift in Sources */,
 				11AC104320599B270027F8F2 /* EmojiArtGestures.swift in Sources */,
@@ -205,6 +209,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -212,6 +217,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -262,6 +268,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -269,6 +276,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;

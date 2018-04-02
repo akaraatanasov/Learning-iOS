@@ -31,7 +31,7 @@ class EmojiArtDocumentTableViewController: UITableViewController {
         }
     }
     
-    // MARK: - UITableViewDataSource methods
+    // MARK: - UITableViewDataSource
     
     override func numberOfSections(in tableView: UITableView) -> Int {
         return 1
