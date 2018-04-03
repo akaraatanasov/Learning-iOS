@@ -21,10 +21,10 @@ class JokesTableViewController: UIViewController {
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "jokeSegue" {
             if let viewController = segue.destination as? JokeViewController {
-                if let jokeId = sender as? Int {
+                
+                if let jokeId = tableView.indexPathForSelectedRow?.row {
                     viewController.id = jokeId
                 }
-                // viewController.id = selectedJokeId ?? 1
             }
         }
     }
@@ -73,8 +73,7 @@ class JokesTableViewController: UIViewController {
 extension JokesTableViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let jokeId = jokesArray[indexPath.row].id
-        performSegue(withIdentifier: "jokeSegue", sender: jokeId)
+        performSegue(withIdentifier: "jokeSegue", sender: self)
     }
     
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCellEditingStyle, forRowAt indexPath: IndexPath) {

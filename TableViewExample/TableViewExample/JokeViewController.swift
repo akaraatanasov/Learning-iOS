@@ -10,7 +10,7 @@ import UIKit
 
 class JokeViewController: UIViewController {
 
-    var id: Int = 1 {
+    var id: Int? {
         didSet {
             getJoke()
         }
@@ -37,11 +37,22 @@ class JokeViewController: UIViewController {
     
     
     @IBAction func nextJokeButton(_ sender: Any) {
-        id += 1
+        getNextJoke()
     }
     
+    func getNextJoke() {
+        guard let id = id else {
+            return
+        }
+        
+        self.id = id + 1
+    }
     
     func getJoke() {
+        guard let id = id else {
+            return
+        }
+        
         let urlString = "https://api.icndb.com/jokes/\(id)"
         guard let url = URL(string: urlString) else {
             return
@@ -61,14 +72,14 @@ class JokeViewController: UIViewController {
                 let jokesData = try JSONDecoder().decode(Response.self, from: data)
                 
                 DispatchQueue.main.async {
-                    self.jokeNumberLabel.text = "Joke Nº: \(self.id)"
+                    self.jokeNumberLabel.text = "Joke Nº: \(id)"
                     
                     self.joke = jokesData.value.joke // MARK: - replace &quot; with " if any found
                     self.categories = jokesData.value.categories
                 }
             } catch let jsonError {
                 print(jsonError)
-                self.id += 1
+                self.getNextJoke()
             }
         }
         
