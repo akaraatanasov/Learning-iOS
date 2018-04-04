@@ -19,8 +19,9 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
     var emojiArt: EmojiArt? {
         get {
             if let url = emojiArtBackgroundImage.url {
-                let emojis = emojiArtView.subviews.compactMap { $0 as? UILabel }.compactMap { EmojiArt.EmojiInfo(label: $0) }
-                return EmojiArt(url: url, emojis: emojis)
+                let emojis = emojiArtView.subviews.compactMap { $0 as? UILabel }
+                let newEmojis = emojis.compactMap { EmojiArt.EmojiInfo(label: $0) }
+                return EmojiArt(url: url, emojis: newEmojis)
             }
             return nil
         }
@@ -159,6 +160,7 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
     func emojiArtViewDidChange(_ sender: EmojiArtView) {
         // just let our document know that the document has changed
         // that way it can autosave it at an opportune time
+        print("save")
         documentChanged()
     }
 
@@ -475,10 +477,10 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
 extension EmojiArt.EmojiInfo
 {
     init?(label: UILabel) {
-        if let attributedText = label.attributedText, let font = attributedText.font {
+        if let attributedText = label.text, let font = label.font {
             x = Int(label.center.x)
             y = Int(label.center.y)
-            text = attributedText.string
+            text = attributedText
             size = Int(font.pointSize)
         } else {
             return nil

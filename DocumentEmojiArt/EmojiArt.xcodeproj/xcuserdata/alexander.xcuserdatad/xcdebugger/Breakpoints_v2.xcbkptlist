@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Bucket
+   type = "1"
+   version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "EmojiArt/EmojiArtViewController.swift"
+            timestampString = "544537666.728825"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "22"
+            endingLineNumber = "22"
+            landmarkName = "emojiArt"
+            landmarkType = "24">
+            <Locations>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "EmojiArt.EmojiArtViewController.emojiArt.getter : Swift.Optional&lt;EmojiArt.EmojiArt&gt;"
+                  moduleName = "EmojiArt"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alexander/Developer/DocumentEmojiArt/EmojiArt/EmojiArtViewController.swift"
+                  timestampString = "544536945.224376"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "22"
+                  endingLineNumber = "22"
+                  offsetFromSymbolStart = "182">
+               </Location>
+               <Location
+                  shouldBeEnabled = "No"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "closure #1 (__ObjC.UIView) -&gt; Swift.Optional&lt;__ObjC.UILabel&gt; in EmojiArt.EmojiArtViewController.emojiArt.getter : Swift.Optional&lt;EmojiArt.EmojiArt&gt;"
+                  moduleName = "EmojiArt"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/alexander/Developer/DocumentEmojiArt/EmojiArt/EmojiArtViewController.swift"
+                  timestampString = "544536945.227815"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "22"
+                  endingLineNumber = "22"
+                  offsetFromSymbolStart = "12">
+               </Location>
+            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
+</Bucket>
