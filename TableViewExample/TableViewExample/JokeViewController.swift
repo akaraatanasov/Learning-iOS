@@ -35,23 +35,20 @@ class JokeViewController: UIViewController {
     
     @IBOutlet weak var jokeCategoriesLabel: UILabel!
     
-    
     @IBAction func nextJokeButton(_ sender: Any) {
         getNextJoke()
     }
     
-    func getNextJoke() {
+    // fetches the joke from the web and saves it to the documents directory
+    func fetchJoke() {
+        print("---fetching joke from the web---")
+        
         guard let id = id else {
+            print("---no such id exist---")
             return
         }
         
-        self.id = id + 1
-    }
-    
-    func getJoke() {
-        guard let id = id else {
-            return
-        }
+        let fileUrl = getDocumentsURL().appendingPathComponent("\(id).json")
         
         let urlString = "https://api.icndb.com/jokes/\(id)"
         guard let url = URL(string: urlString) else {
@@ -69,21 +66,62 @@ class JokeViewController: UIViewController {
             }
             
             do {
-                let jokesData = try JSONDecoder().decode(Response.self, from: data)
+                // Doing this to check if the JSON can decode the json and if yes - it will save itself to the documents folder - else it will throw
+                try JSONDecoder().decode(Response.self, from: data)
+                // Write this data to the fileUrl
+                try data.write(to: fileUrl)
+                self.getJoke()
+            } catch let error {
+                print(error)
                 
-                DispatchQueue.main.async {
-                    self.jokeNumberLabel.text = "Joke Nº: \(id)"
-                    
-                    self.joke = jokesData.value.joke // MARK: - replace &quot; with " if any found
-                    self.categories = jokesData.value.categories
-                }
-            } catch let jsonError {
-                print(jsonError)
                 self.getNextJoke()
             }
         }
         
         task.resume()
     }
+    
+    // gets the joke from the documents directory
+    func getJoke() {
+        print("---getting joke from documents folder---")
+        
+        guard let id = id else {
+            print("---no such id exist---")
+            return
+        }
+        
+        let fileUrl = getDocumentsURL().appendingPathComponent("\(id).json")
+        
+        do {
+            let data = try Data(contentsOf: fileUrl) // Read this data from the fileUrl
+            let jokesData = try JSONDecoder().decode(Response.self, from: data)
+            
+            DispatchQueue.main.async {
+                self.jokeNumberLabel.text = "Joke Nº: \(id)"
+                self.joke = jokesData.value.joke // MARK: - replace &quot; with " if any found
+                self.categories = jokesData.value.categories
+            }
+            
+        } catch let error {
+            print(error)
+            
+            fetchJoke()
+        }
+    }
+    
+    func getNextJoke() {
+        guard let id = id else {
+            return
+        }
+        
+        self.id = id + 1
+    }
 
+    func getDocumentsURL() -> URL {
+        if let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
+            return url
+        } else {
+            fatalError("Could not retrieve documents directory")
+        }
+    }
 }

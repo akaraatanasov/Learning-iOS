@@ -22,7 +22,8 @@ class JokesTableViewController: UIViewController {
         if segue.identifier == "jokeSegue" {
             if let viewController = segue.destination as? JokeViewController {
                 
-                if let jokeId = tableView.indexPathForSelectedRow?.row {
+                if let rowIndex = tableView.indexPathForSelectedRow?.row {
+                    let jokeId = jokesArray[rowIndex].id
                     viewController.id = jokeId
                 }
             }
