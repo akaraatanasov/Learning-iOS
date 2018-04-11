@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="XX0-wc-Ps3">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="XX0-wc-Ps3">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Aspect ratio constraints" minToolsVersion="5.1"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
-    <customFonts key="customFonts">
-        <array key="HelveticaNeue.ttc">
-            <string>HelveticaNeue</string>
-        </array>
-    </customFonts>
     <scenes>
         <!--Jokes Table View Controller-->
         <scene sceneID="Mbw-BE-si8">
@@ -71,14 +66,14 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="8QA-v4-psh">
-                                <rect key="frame" x="36" y="125" width="302" height="416"/>
+                                <rect key="frame" x="36" y="177" width="302" height="364"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <mutableString key="text">Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda.</mutableString>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="23"/>
                                 <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
                             </textView>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Joke Nº: " textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="AZA-s1-8S5">
-                                <rect key="frame" x="36" y="96" width="69" height="21"/>
+                                <rect key="frame" x="36" y="148" width="69" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -100,7 +95,6 @@
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <constraints>
-                            <constraint firstItem="PSF-aI-pJN" firstAttribute="top" secondItem="8QA-v4-psh" secondAttribute="bottom" constant="45" id="7mP-4Q-XuM"/>
                             <constraint firstItem="PSF-aI-pJN" firstAttribute="leading" secondItem="J5j-dx-tU7" secondAttribute="leading" constant="98" id="K5Y-Sc-jx4"/>
                             <constraint firstItem="J5j-dx-tU7" firstAttribute="trailing" secondItem="8QA-v4-psh" secondAttribute="trailing" constant="37" id="Lb3-7b-Dde"/>
                             <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="AZA-s1-8S5" secondAttribute="trailing" constant="20" symbolic="YES" id="NIJ-22-BLz"/>
@@ -108,6 +102,7 @@
                             <constraint firstItem="8QA-v4-psh" firstAttribute="top" secondItem="AZA-s1-8S5" secondAttribute="bottom" constant="8" id="Pli-Yj-QvD"/>
                             <constraint firstItem="J5j-dx-tU7" firstAttribute="trailing" secondItem="PSF-aI-pJN" secondAttribute="trailing" constant="99" id="QS9-88-Stb"/>
                             <constraint firstItem="AZA-s1-8S5" firstAttribute="leading" secondItem="J5j-dx-tU7" secondAttribute="leading" constant="36" id="Ryf-xu-r7e"/>
+                            <constraint firstItem="PSF-aI-pJN" firstAttribute="top" secondItem="y7i-QH-lKU" secondAttribute="bottom" constant="8" id="XOl-Ta-xPK"/>
                             <constraint firstItem="J5j-dx-tU7" firstAttribute="bottom" secondItem="PSF-aI-pJN" secondAttribute="bottom" constant="20" id="ZeO-8a-WBP"/>
                             <constraint firstItem="y7i-QH-lKU" firstAttribute="top" secondItem="8QA-v4-psh" secondAttribute="bottom" constant="16" id="e6v-H1-kCS"/>
                             <constraint firstItem="8QA-v4-psh" firstAttribute="leading" secondItem="J5j-dx-tU7" secondAttribute="leading" constant="36" id="gjN-Uf-Rnc"/>
@@ -142,9 +137,7 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="30"/>
                                 <state key="normal" title="B1"/>
                                 <connections>
-                                    <segue destination="gx1-Hc-asy" kind="show" id="XjA-2J-BX9">
-                                        <nil key="action"/>
-                                    </segue>
+                                    <segue destination="gx1-Hc-asy" kind="show" id="XjA-2J-BX9"/>
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="I20-RG-t9e">
@@ -167,7 +160,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0FI-fv-FVX">
-                                <rect key="frame" x="149" y="332" width="76" height="48"/>
+                                <rect key="frame" x="149" y="358" width="76" height="48"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="30"/>
                                 <state key="normal" title="Jokes"/>
                                 <connections>
@@ -309,8 +302,8 @@
         <scene sceneID="OD4-c8-cIX">
             <objects>
                 <navigationController id="XX0-wc-Ps3" sceneMemberID="viewController">
-                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="scf-bt-CnB">
-                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="scf-bt-CnB">
+                        <rect key="frame" x="0.0" y="20" width="375" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <connections>
@@ -410,7 +403,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" mapType="standard" translatesAutoresizingMaskIntoConstraints="NO" id="xMo-Qx-kGM">
-                                <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                                <rect key="frame" x="0.0" y="116" width="375" height="551"/>
                             </mapView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -439,7 +432,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="4VU-tm-zFt">
-                                <rect key="frame" x="0.0" y="64" width="375" height="559"/>
+                                <rect key="frame" x="0.0" y="116" width="375" height="507"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="customCell" textLabel="Owe-Cs-tBH" style="IBUITableViewCellStyleDefault" id="JB1-XF-uGy">
@@ -537,7 +530,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="KtM-rn-Egd">
-                                <rect key="frame" x="0.0" y="188" width="375" height="435"/>
+                                <rect key="frame" x="0.0" y="240" width="375" height="383"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="filteredCell" id="jUE-4f-Uid">
@@ -569,7 +562,7 @@
                                 </connections>
                             </tableView>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="fBl-6j-TFU">
-                                <rect key="frame" x="59" y="110" width="256" height="30"/>
+                                <rect key="frame" x="59" y="162" width="256" height="30"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>

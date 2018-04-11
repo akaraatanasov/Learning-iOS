@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1119ED87207D042F00EC4AE1 /* TableViewExample.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 1119ED85207D042F00EC4AE1 /* TableViewExample.xcdatamodeld */; };
 		1121338E206420DC00279910 /* PhotoCollectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1121338D206420DC00279910 /* PhotoCollectionViewController.swift */; };
 		112133902064288100279910 /* PhotoCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1121338F2064288100279910 /* PhotoCell.swift */; };
 		112AEA36206BD840004E0B17 /* PhotoData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 112AEA35206BD840004E0B17 /* PhotoData.swift */; };
@@ -28,6 +29,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1119ED86207D042F00EC4AE1 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		1121338D206420DC00279910 /* PhotoCollectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCollectionViewController.swift; sourceTree = "<group>"; };
 		1121338F2064288100279910 /* PhotoCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoCell.swift; sourceTree = "<group>"; };
 		112AEA35206BD840004E0B17 /* PhotoData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoData.swift; sourceTree = "<group>"; };
@@ -95,6 +97,7 @@
 				1131D21020629958002FA2EA /* TableSectionHeader.xib */,
 				11DFBB30205FE6A80044E892 /* Main.storyboard */,
 				11DFBB2E205FE6A80044E892 /* ViewController.swift */,
+				1119ED85207D042F00EC4AE1 /* TableViewExample.xcdatamodeld */,
 				11DFBB33205FE6A80044E892 /* Assets.xcassets */,
 				11DFBB2C205FE6A80044E892 /* AppDelegate.swift */,
 				11DFBB35205FE6A80044E892 /* LaunchScreen.storyboard */,
@@ -178,6 +181,7 @@
 			files = (
 				11DFBB2F205FE6A80044E892 /* ViewController.swift in Sources */,
 				1139953F206EA66500E74CE6 /* JokeViewController.swift in Sources */,
+				1119ED87207D042F00EC4AE1 /* TableViewExample.xcdatamodeld in Sources */,
 				112133902064288100279910 /* PhotoCell.swift in Sources */,
 				1131D2132063EF69002FA2EA /* FilteredTableViewController.swift in Sources */,
 				116CD69C206A724600CC6348 /* MapViewController.swift in Sources */,
@@ -380,6 +384,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		1119ED85207D042F00EC4AE1 /* TableViewExample.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				1119ED86207D042F00EC4AE1 /* Model.xcdatamodel */,
+			);
+			currentVersion = 1119ED86207D042F00EC4AE1 /* Model.xcdatamodel */;
+			path = TableViewExample.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 11DFBB21205FE6A80044E892 /* Project object */;
 }

@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 struct ArrayResponse: Codable {
     let type: String
@@ -23,3 +24,13 @@ struct Joke: Codable {
     let joke: String
     let categories: [String]
 }
+
+enum ResponseError: Error {
+    case NoSuchQuoteException(String)
+}
+
+//class Jokes: NSManagedObject {
+//    @NSManaged var id: Int
+//    @NSManaged var joke: String
+//    @NSManaged var categories: [String]
+//}
