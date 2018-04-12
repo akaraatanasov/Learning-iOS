@@ -8,7 +8,7 @@
 
 import UIKit
 
-class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScrollViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDragDelegate, UICollectionViewDropDelegate, EmojiArtViewDelegate
+class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScrollViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDragDelegate, UICollectionViewDropDelegate
 {
     // MARK: - Model
     
@@ -19,15 +19,14 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
     var emojiArt: EmojiArt? {
         get {
             if let url = emojiArtBackgroundImage.url {
-                let emojis = emojiArtView.subviews.compactMap { $0 as? UILabel }
-                let newEmojis = emojis.compactMap { EmojiArt.EmojiInfo(label: $0) }
-                return EmojiArt(url: url, emojis: newEmojis)
+                let emojis = emojiArtView.subviews.flatMap { $0 as? UILabel }.flatMap { EmojiArt.EmojiInfo(label: $0) }
+                return EmojiArt(url: url, emojis: emojis)
             }
             return nil
         }
         set {
             emojiArtBackgroundImage = (nil, nil)
-            emojiArtView.subviews.compactMap { $0 as? UILabel }.forEach { $0.removeFromSuperview() }
+            emojiArtView.subviews.flatMap { $0 as? UILabel }.forEach { $0.removeFromSuperview() }
             if let url = newValue?.url {
                 imageFetcher = ImageFetcher(fetch: url) { (url, image) in
                     DispatchQueue.main.async {
@@ -72,6 +71,11 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
     }
     
     @IBAction func close(_ sender: UIBarButtonItem) {
+        // when we close our document
+        // stop observing EmojiArtView changes
+        if let observer = emojiArtViewObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
         // MODIFIED AFTER LECTURE 14
         // the call to save() that used to be here has been removed
         // because we no longer explicitly save our document
@@ -89,12 +93,31 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
         // dismiss ourselves from having been presented modally
         // and when we're done, close our document
         dismiss(animated: true) {
-            self.document?.close()
+            self.document?.close { success in
+                // when our document completes closing
+                // stop observing its documentState changes
+                if let observer = self.documentObserver {
+                    NotificationCenter.default.removeObserver(observer)
+                }
+            }
         }
     }
     
+    private var documentObserver: NSObjectProtocol?
+    private var emojiArtViewObserver: NSObjectProtocol?
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        // when we are about to appear
+        // start monitoring our document's documentState
+        documentObserver = NotificationCenter.default.addObserver(
+            forName: Notification.Name.UIDocumentStateChanged,
+            object: document,
+            queue: OperationQueue.main,
+            using: { notification in
+                print("documentState changed to \(self.document!.documentState)")
+            }
+        )
         // whenever we appear, we'll open our document
         // (might want to close it in viewDidDisappear, by the way)
         document?.open { success in
@@ -102,6 +125,18 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
                 self.title = self.document?.localizedName
                 // update our Model from the document's Model
                 self.emojiArt = self.document?.emojiArt
+                // now that our document is open
+                // start watching our EmojiArtView for changes
+                // so we can let our document know when it has changes
+                // that need to be autosaved
+                self.emojiArtViewObserver = NotificationCenter.default.addObserver(
+                    forName: .EmojiArtViewDidChange,
+                    object: self.emojiArtView,
+                    queue: OperationQueue.main,
+                    using: { notification in
+                        self.documentChanged()
+                    }
+                )
             }
         }
     }
@@ -148,22 +183,12 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
     // MODIFIED AFTER LECTURE 14
     // when we create our EmojiArtView, we also set ourself as its delegate
     // so that we can get emojiArtViewDidChange messages sent to us
+    // MODIFIED AGAIN DURING LECTURE 15
+    // now we use the EmojiArtViewDidChange Notification
+    // to find out when the emojiArtView changes instead
 
-    lazy var emojiArtView: EmojiArtView = {
-        let eav = EmojiArtView()
-        eav.delegate = self
-        return eav
-    }()
+    lazy var emojiArtView = EmojiArtView()
     
-    // EmojiArtViewDelegate
-    
-    func emojiArtViewDidChange(_ sender: EmojiArtView) {
-        // just let our document know that the document has changed
-        // that way it can autosave it at an opportune time
-        print("save")
-        documentChanged()
-    }
-
     // we make this a tuple
     // so that whenever a background image is set
     // we also capture the url of that image
@@ -434,6 +459,14 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
     var imageFetcher: ImageFetcher!
     
     func dropInteraction(_ interaction: UIDropInteraction, performDrop session: UIDropSession) {
+        // we create the ImageFetcher here
+        // but we don't use it any more
+        // could comment this out, but it doesn't really do any work
+        // if we don't call fetch(url:)
+        // so there's no harm in leaving it here
+        // and if we ever wanted to go back to using ImageFetcher
+        // we could just uncomment the fetch(url) call back in
+        // and all would work
         imageFetcher = ImageFetcher() { (url, image) in
             DispatchQueue.main.async {
                 // we've received the dropped image from the url
@@ -449,16 +482,66 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
                 self.documentChanged()
             }
         }
-
         session.loadObjects(ofClass: NSURL.self) { nsurls in
             if let url = nsurls.first as? URL {
-                self.imageFetcher.fetch(url)
+                // stop using ImageFetcher
+                // self.imageFetcher.fetch(url)
+                // fetch the URL normally (off the main thread, of course)
+                DispatchQueue.global(qos: .userInitiated).async {
+                    if let imageData = try? Data(contentsOf: url.imageURL), let image = UIImage(data: imageData) {
+                        DispatchQueue.main.async {
+                            // successfully fetched the image!
+                            self.emojiArtBackgroundImage = (url, image)
+                            self.documentChanged()
+                        }
+                    } else {
+                        // if the dropped URL can't be fetched
+                        // alert the user
+                        self.presentBadURLWarning(for: url)
+                    }
+                }
             }
         }
         session.loadObjects(ofClass: UIImage.self) { images in
             if let image = images.first as? UIImage {
+                // we are setting the background image for the ImageFetcher
+                // but since we never initiate the fetch(url) in ImageFetcher anymore
+                // this is meaningless
+                // no harm leaving it here, however
                 self.imageFetcher.backup = image
             }
+        }
+    }
+    
+    // when a URL is dropped on us that we can't fetch
+    // complain using an alert
+    // and offer the user the option to suppress such warnings
+    // probably we would like a feature where that suppression
+    // turns off if the same url is dragged in twice
+    // also, this whole thing resets when the application is restarted
+    // we should be storing this var in UserDefaults
+    
+    private var suppressBadURLWarnings = false
+    
+    private func presentBadURLWarning(for url: URL?) {
+        if !suppressBadURLWarnings {
+            let alert = UIAlertController(
+                title: "Image Transfer Failed",
+                message: "Couldn't transfer the dropped image from its source.\nShow this warning in the future?",
+                preferredStyle: .alert
+            )
+            alert.addAction(UIAlertAction(
+                title: "Keep Warning",
+                style: .default
+            ))
+            alert.addAction(UIAlertAction(
+                title: "Stop Warning",
+                style: .destructive,
+                handler: { action in
+                    self.suppressBadURLWarnings = true
+                }
+            ))
+            present(alert, animated: true)
         }
     }
 }
@@ -477,10 +560,10 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
 extension EmojiArt.EmojiInfo
 {
     init?(label: UILabel) {
-        if let attributedText = label.text, let font = label.font {
+        if let attributedText = label.attributedText, let font = attributedText.font {
             x = Int(label.center.x)
             y = Int(label.center.y)
-            text = attributedText
+            text = attributedText.string
             size = Int(font.pointSize)
         } else {
             return nil
