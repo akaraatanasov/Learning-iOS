@@ -8,14 +8,75 @@
 
 import UIKit
 
-class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScrollViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDragDelegate, UICollectionViewDropDelegate
+class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScrollViewDelegate, UICollectionViewDataSource, UICollectionViewDelegate, UICollectionViewDelegateFlowLayout, UICollectionViewDragDelegate, UICollectionViewDropDelegate, UIPopoverPresentationControllerDelegate
 {
+    // MARK: - Navigation
+    
+    // here we prepare both for our Modal and Popover segues
+    // and for our Embed Segue
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "Show Document Info" {
+            if let destination = segue.destination.contents as? DocumentInfoViewController {
+                document?.thumbnail = emojiArtView.snapshot
+                destination.document = document
+                // if we're in a popover set ourselves as the delegate
+                // so we can control the adaptation behavior to compact environments
+                if let ppc = destination.popoverPresentationController {
+                    ppc.delegate = self
+                    // we could do other popover configuration here too
+                }
+            }
+        } else if segue.identifier == "Embed Document Info" {
+            // just grab onto the MVC so we can update it later
+            embeddedDocInfo = segue.destination.contents as? DocumentInfoViewController
+        }
+    }
+    
+    // a Popover Segue adapts by default in horizontally compact environments
+    // but we don't actually want that for our small popover
+    // so we set the UIPopoverPresentationController's delegate
+    // to ourself in prepare(for segue:)
+    // then implement this delegate method which returns
+    // that the adaptation style it should use is always .none
+    // (i.e. never adapt)
+    // if we wanted to, we could have looked at the traitCollection
+    // to see what environment is being adapted to and made a decision from there
+
+    func adaptivePresentationStyle(
+        for controller: UIPresentationController,
+        traitCollection: UITraitCollection
+    ) -> UIModalPresentationStyle {
+        return .none
+    }
+    
+    // we allow view controllers that we've presented
+    // to dismiss themselves by using an Unwind Segue back to us
+    // which will also close the document
+    // the view controller we're unwinding from
+    // is available in bySegue.source
+    // (we don't happen to need it, but if we did ...)
+
+    @IBAction func close(bySegue: UIStoryboardSegue) {
+        close()
+    }
+    
+    // we grab ahold of our embedded DocumentInfoViewController
+    // during the prepare for that Embed Segue
+    // we then keep it up to date as our document changes
+    
+    private var embeddedDocInfo: DocumentInfoViewController?
+    
+    // these layout constraints
+    // allow us to size our embedded DocumentInfoViewController
+    // to its preferredContentSize
+    // (see viewWillAppear below)
+
+    @IBOutlet weak var embeddedDocInfoWidth: NSLayoutConstraint!
+    @IBOutlet weak var embeddedDocInfoHeight: NSLayoutConstraint!
+    
     // MARK: - Model
     
-    // computed property for our Model
-    // if someone sets this, we'll update our UI
-    // if someone asks for this, we'll cons up a Model from the UI
-
     var emojiArt: EmojiArt? {
         get {
             if let url = emojiArtBackgroundImage.url {
@@ -38,7 +99,6 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
                     }
                 }
             }
-
         }
     }
     
@@ -46,56 +106,23 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
 
     var document: EmojiArtDocument?
     
-    // MODIFIED AFTER LECTURE 14
-    // we no longer need a save method or button
-    // because now we are the EmojiArtView's delegate
-    // (search for "delegate = self" below)
-    // and we get notified when the EmojiArtView changes
-    // (we also note when a new image is dropped, search "documentChanged" below)
-    // and so we can just update our UIDocument's Model to match ours
-    // and tell our UIDocument that it has changed
-    // and it will autosave at the next opportune moment
-
 //  @IBAction func save(_ sender: UIBarButtonItem? = nil) {
     func documentChanged() {
-        // NO CHANGES *INSIDE* THIS METHOD WERE MADE AFTER LECTURE 14
-        // JUST ITS NAME WAS CHANGED (FROM save TO documentChanged)
-        
-        // update the document's Model to match ours
         document?.emojiArt = emojiArt
-        // then tell the document that something has changed
-        // so it will autosave at next best opportunity
         if document?.emojiArt != nil {
             document?.updateChangeCount(.done)
         }
     }
     
-    @IBAction func close(_ sender: UIBarButtonItem) {
-        // when we close our document
-        // stop observing EmojiArtView changes
+    @IBAction func close(_ sender: UIBarButtonItem? = nil) {
         if let observer = emojiArtViewObserver {
             NotificationCenter.default.removeObserver(observer)
         }
-        // MODIFIED AFTER LECTURE 14
-        // the call to save() that used to be here has been removed
-        // because we no longer explicitly save our document
-        // we just mark that it has been changed
-        // and since we are reliably doing that now
-        // we don't need to try to save it when we close it
-        // UIDocument will automatically autosave when we close()
-        // if it has any unsaved changes
-        // the rest of this method is unchanged from lecture 14
-
-        // set a nice thumbnail instead of an icon for our document
         if document?.emojiArt != nil {
             document?.thumbnail = emojiArtView.snapshot
         }
-        // dismiss ourselves from having been presented modally
-        // and when we're done, close our document
-        dismiss(animated: true) {
+        presentingViewController?.dismiss(animated: true) {
             self.document?.close { success in
-                // when our document completes closing
-                // stop observing its documentState changes
                 if let observer = self.documentObserver {
                     NotificationCenter.default.removeObserver(observer)
                 }
@@ -108,27 +135,27 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        // when we are about to appear
-        // start monitoring our document's documentState
         documentObserver = NotificationCenter.default.addObserver(
             forName: Notification.Name.UIDocumentStateChanged,
             object: document,
             queue: OperationQueue.main,
             using: { notification in
                 print("documentState changed to \(self.document!.documentState)")
+                // if the document state changes to .normal
+                // (either because we just opened it or it finished autosaving)
+                // update the document in our embedded DocumentInfoViewController
+                // and also resize it to its preferredContentSize
+                if self.document!.documentState == .normal, let docInfoVC = self.embeddedDocInfo {
+                    docInfoVC.document = self.document
+                    self.embeddedDocInfoWidth.constant = docInfoVC.preferredContentSize.width
+                    self.embeddedDocInfoHeight.constant = docInfoVC.preferredContentSize.height
+                }
             }
         )
-        // whenever we appear, we'll open our document
-        // (might want to close it in viewDidDisappear, by the way)
         document?.open { success in
             if success {
                 self.title = self.document?.localizedName
-                // update our Model from the document's Model
                 self.emojiArt = self.document?.emojiArt
-                // now that our document is open
-                // start watching our EmojiArtView for changes
-                // so we can let our document know when it has changes
-                // that need to be autosaved
                 self.emojiArtViewObserver = NotificationCenter.default.addObserver(
                     forName: .EmojiArtViewDidChange,
                     object: self.emojiArtView,
@@ -161,14 +188,6 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
         }
     }
     
-    // change our scroll view's width and height constraints
-    // in the storyboard
-    // to be the same as the scroll view's content area's size
-    // the width and height are lower priority constraints
-    // than "stay within the edges" and "keep the scroll view centered"
-    // so this will still work for very large content area sizes
-    // (a scroll view's content area gets very large when you zoom in on it)
-
     func scrollViewDidZoom(_ scrollView: UIScrollView) {
         scrollViewHeight.constant = scrollView.contentSize.height
         scrollViewWidth.constant = scrollView.contentSize.width
@@ -180,19 +199,8 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
     
     // MARK: - Emoji Art View
 
-    // MODIFIED AFTER LECTURE 14
-    // when we create our EmojiArtView, we also set ourself as its delegate
-    // so that we can get emojiArtViewDidChange messages sent to us
-    // MODIFIED AGAIN DURING LECTURE 15
-    // now we use the EmojiArtViewDidChange Notification
-    // to find out when the emojiArtView changes instead
-
     lazy var emojiArtView = EmojiArtView()
     
-    // we make this a tuple
-    // so that whenever a background image is set
-    // we also capture the url of that image
-
     var emojiArtBackgroundImage: (url: URL?, image: UIImage?) {
         get {
             return (_emojiArtBackgroundImageURL, emojiArtView.backgroundImage)
@@ -212,16 +220,9 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
         }
     }
 
-    // this starts with _ because it's not something we set directly
-    // the value of this is owned by the non-_ var emojiArtBackgroundImage
-
     private var _emojiArtBackgroundImageURL: URL?
 
     // MARK: - Emoji Collection View
-
-    // a String is a Collection of Character
-    // we want this var to be an Array of String
-    // so we use .map to convert it
 
     var emojis = "😀🎁✈️🎱🍎🐶🐝☕️🎼🚲♣️👨‍🎓✏️🌈🤡🎓👻☎️".map { String($0) }
 
@@ -231,8 +232,6 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
             emojiCollectionView.delegate = self
             emojiCollectionView.dragDelegate = self
             emojiCollectionView.dropDelegate = self
-            // dragging in a Collection View is disabled by default on iPhone
-            // we want it enabled on all platforms
             emojiCollectionView.dragInteractionEnabled = true
         }
     }
@@ -242,24 +241,16 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
         return UIFontMetrics(forTextStyle: .body).scaledFont(for: UIFont.preferredFont(forTextStyle: .body).withSize(64.0))
     }
     
-    // addingEmoji is a mode we go into when we want to put up a text field
-    // in section 0 of our Collection View
-    // which allows us to type in more emoji to add to our Collection View
-
     private var addingEmoji = false
     
     @IBAction func addEmoji() {
         addingEmoji = true
-        // reload section zero because now it contains a text field
-        // instead of a button
         emojiCollectionView.reloadSections(IndexSet(integer: 0))
     }
     
     // MARK: - UICollectionViewDataSource
     
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        // section 0: button or text field to add emoji
-        // section 1: our emoji
         return 2
     }
     
@@ -273,8 +264,6 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if indexPath.section == 1 {
-            // our emoji are shown using an EmojiCollectionViewCell
-            // which has an outlet to a lable to show the emoji
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiCell", for: indexPath)
             if let emojiCell = cell as? EmojiCollectionViewCell {
                 let text = NSAttributedString(string: emojis[indexPath.item], attributes: [.font:font])
@@ -282,21 +271,13 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
             }
             return cell
         } else if addingEmoji {
-            // if we're addingEmoji (and we're being asked for a cell in section 0)
-            // then we need our EmojiInputCell which has a text field in it
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "EmojiInputCell", for: indexPath)
             if let inputCell = cell as? TextFieldCollectionViewCell {
-                // the resignationHandler is called when the cell's text field
-                // resigns first responder (i.e. it is not the text field receiving keyboard input)
                 inputCell.resignationHandler = { [weak self, unowned inputCell] in
-                    // have to make self weak and inputCell unowned to prevent memory cycle
                     if let text = inputCell.textField.text {
                         self?.emojis = (text.map { String($0) } + self!.emojis).uniquified
                     }
                     self?.addingEmoji = false
-                    // reload the Collection View
-                    // because section 0 is going to change (back to a + button)
-                    // and because we've added new emoji to section 1
                     self?.emojiCollectionView.reloadData()
                 }
             }
@@ -309,14 +290,6 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
     
     // MARK: - UICollectionViewDelegateFlowLayout
     
-    // section 0's cell should be wider
-    // but only if it's showing the text field (i.e. we're addingEmoji)
-    // note that we are using constants here
-    // that's bad
-    // we should calculate our cell height based on the size of our emoji font
-    // we should also set the height of our Collection View itself based on that
-    // (via an outlet to a constraint on the Collection View in the storyboard)
-
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         if addingEmoji && indexPath.section == 0 {
             return CGSize(width: 300, height: 80)
@@ -327,9 +300,6 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
     
     // MARK: - UICollectionViewDelegate
 
-    // just before we ever display the text field for addingEmoji
-    // let's make it the first responder and so bring up the keyboard
-
     func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         if let inputCell = cell as? TextFieldCollectionViewCell {
             inputCell.textField.becomeFirstResponder()
@@ -339,7 +309,7 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
     // MARK: - UICollectionViewDragDelegate
     
     func collectionView(_ collectionView: UICollectionView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
-        session.localContext = collectionView // so we know when a drag "is us"
+        session.localContext = collectionView
         return dragItems(at: indexPath)
     }
     
@@ -348,9 +318,6 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
     }
     
     private func dragItems(at indexPath: IndexPath) -> [UIDragItem] {
-        // prevent dragging when we're addingEmoji (just smoother that way)
-        // cellForItem(at:) only works for visible cells
-        // but if we're dragging from a cell, it definitely will be visible
         if !addingEmoji, let attributedString = (emojiCollectionView.cellForItem(at: indexPath) as? EmojiCollectionViewCell)?.label.attributedText {
             let dragItem = UIDragItem(itemProvider: NSItemProvider(object: attributedString))
             dragItem.localObject = attributedString
@@ -368,12 +335,9 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
     
     func collectionView(_ collectionView: UICollectionView, dropSessionDidUpdate session: UIDropSession, withDestinationIndexPath destinationIndexPath: IndexPath?) -> UICollectionViewDropProposal {
         if let indexPath = destinationIndexPath, indexPath.section == 1 {
-            // if we're dropping a drag from ourself, .move, else .copy
             let isSelf = (session.localDragSession?.localContext as? UICollectionView) == collectionView
             return UICollectionViewDropProposal(operation: isSelf ? .move : .copy, intent: .insertAtDestinationIndexPath)
         } else {
-            // only allow dragging around in section 1 (the emoji)
-            // not in section 0 (the button or text field for addingEmoji)
             return UICollectionViewDropProposal(operation: .cancel)
         }
     }
@@ -383,51 +347,29 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
         performDropWith coordinator: UICollectionViewDropCoordinator
     ) {
         let destinationIndexPath = coordinator.destinationIndexPath ?? IndexPath(item: 0, section: 0)
-        // go through all the things that are being dropped on us
         for item in coordinator.items {
-            // the item will only have a sourceIndexPath
-            // if this drag was initiated inside ourself
             if let sourceIndexPath = item.sourceIndexPath {
                 if let attributedString = item.dragItem.localObject as? NSAttributedString {
-                    // drag and drop from ourself
                     collectionView.performBatchUpdates({
-                        // update our Model to move the emoji to the new spot
                         emojis.remove(at: sourceIndexPath.item)
                         emojis.insert(attributedString.string, at: destinationIndexPath.item)
-                        // update the Collection View
-                        // note that since this takes us two steps
-                        // we have to do this inside performBatchUpdates()
                         collectionView.deleteItems(at: [sourceIndexPath])
                         collectionView.insertItems(at: [destinationIndexPath])
                     })
-                    // ask the coordinator to animate the drop happening
                     coordinator.drop(item.dragItem, toItemAt: destinationIndexPath)
                 }
             } else {
-                // this drag is from somewhere else
-                // we can only get the data from that somewhere else asynchronously
-                // so we have to put a placeholder into our Collection View
-                // while we wait for that asynchronous data to appear
                 let placeholderContext = coordinator.drop(
                     item.dragItem,
                     to: UICollectionViewDropPlaceholder(insertionIndexPath: destinationIndexPath, reuseIdentifier: "DropPlaceholderCell")
                 )
-                // go get the data asynchronously
                 item.dragItem.itemProvider.loadObject(ofClass: NSAttributedString.self) { (provider, error) in
-                    // when it arrives, go back to the main queue ...
                     DispatchQueue.main.async {
-                        // ... and grab the dropped string ...
                         if let attributedString = provider as? NSAttributedString {
-                            // ... and then replace the placeholder
-                            // we are only responsible for updating our Model here
-                            // the Collection View will take care of replacing the placeholder
-                            // with a cell by calling our cellForItem(at:) dataSource method
                             placeholderContext.commitInsertion(dataSourceUpdates: { insertionIndexPath in
                                 self.emojis.insert(attributedString.string, at: insertionIndexPath.item)
                             })
                         } else {
-                            // hmm, couldn't get the data for some reason
-                            // so delete the placeholder
                             placeholderContext.deletePlaceholder()
                         }
                     }
@@ -438,10 +380,6 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
 
     // MARK: - UIDropInteractionDelegate
 
-    // this is for dropping into our dropZone (not the Collection View)
-    // we only accept drops that can provide both URL and UIImage data
-    // we're hoping that the URL is a URL to that UIImage (not guaranteed to be so)
-
     func dropInteraction(_ interaction: UIDropInteraction, canHandle session: UIDropSession) -> Bool {
         return session.canLoadObjects(ofClass: NSURL.self) && session.canLoadObjects(ofClass: UIImage.self)
     }
@@ -450,78 +388,56 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
         return UIDropProposal(operation: .copy)
     }
     
-    // ImageFetcher is defined in Utilities.swift
-    // it fetches a url but also allows a "backup" image to be defined
-    // if it has to resort to the backup, then it puts it in the filesystem
-    // so this will not work very well for documents stored on iCloud Drive for example
-    // makes the demos a bit smoother though :)
-    
     var imageFetcher: ImageFetcher!
     
     func dropInteraction(_ interaction: UIDropInteraction, performDrop session: UIDropSession) {
-        // we create the ImageFetcher here
-        // but we don't use it any more
-        // could comment this out, but it doesn't really do any work
-        // if we don't call fetch(url:)
-        // so there's no harm in leaving it here
-        // and if we ever wanted to go back to using ImageFetcher
-        // we could just uncomment the fetch(url) call back in
-        // and all would work
+        // this imageFetcher won't be used anymore
+        // since we never call fetch() on it
+        // (see below)
         imageFetcher = ImageFetcher() { (url, image) in
             DispatchQueue.main.async {
-                // we've received the dropped image from the url
-                // (or we've fallen back on using the backup image)
-                // now go set this as the background of our EmojiArt document
                 self.emojiArtBackgroundImage = (url, image)
-                // ADDED AFTER LECTURE 14
-                // in addition to emoji being added in our EmojiArtView
-                // causing our document to change
-                // whenever a new background image is dropped
-                // our document changes as well
-                // so we note that
                 self.documentChanged()
             }
         }
         session.loadObjects(ofClass: NSURL.self) { nsurls in
             if let url = nsurls.first as? URL {
-                // stop using ImageFetcher
+                // as of L16, we no longer accept
+                // URLs that we can't fetch the image for
+                // so don't use ImageFetcher anymore
+                // (since it allows for a "backup" image in that case)
+                // instead, just do our normal background fetch (like in Cassini)
                 // self.imageFetcher.fetch(url)
-                // fetch the URL normally (off the main thread, of course)
                 DispatchQueue.global(qos: .userInitiated).async {
                     if let imageData = try? Data(contentsOf: url.imageURL), let image = UIImage(data: imageData) {
                         DispatchQueue.main.async {
-                            // successfully fetched the image!
                             self.emojiArtBackgroundImage = (url, image)
                             self.documentChanged()
                         }
                     } else {
-                        // if the dropped URL can't be fetched
-                        // alert the user
+                        // if we can't fetch the url, warn the user
                         self.presentBadURLWarning(for: url)
                     }
                 }
+                
             }
         }
         session.loadObjects(ofClass: UIImage.self) { images in
             if let image = images.first as? UIImage {
-                // we are setting the background image for the ImageFetcher
-                // but since we never initiate the fetch(url) in ImageFetcher anymore
-                // this is meaningless
-                // no harm leaving it here, however
                 self.imageFetcher.backup = image
             }
         }
     }
     
-    // when a URL is dropped on us that we can't fetch
-    // complain using an alert
-    // and offer the user the option to suppress such warnings
-    // probably we would like a feature where that suppression
-    // turns off if the same url is dragged in twice
-    // also, this whole thing resets when the application is restarted
-    // we should be storing this var in UserDefaults
+    // MARK: - Bad URL Warnings
     
-    private var suppressBadURLWarnings = false
+    // if the user drags in a URL
+    // that we can't fetch the contents of
+    // warn them with an alert
+    // the alert offers them the option of silencing future warnings
+    // a cool thing to do here might be to turn warnings back on
+    // if they have silenced them in the past
+    // but drag in the same bad URL twice in a row
     
     private func presentBadURLWarning(for url: URL?) {
         if !suppressBadURLWarnings {
@@ -539,23 +455,14 @@ class EmojiArtViewController: UIViewController, UIDropInteractionDelegate, UIScr
                 style: .destructive,
                 handler: { action in
                     self.suppressBadURLWarnings = true
-                }
+            }
             ))
             present(alert, animated: true)
         }
     }
+    
+    private var suppressBadURLWarnings = false
 }
-
-// an extension to our Model
-// note that this has "UI stuff" in it
-// because it uses UILabel
-// that's okay because this code is in our Controller
-// (even though it extends code in our Model)
-// for MVC purposes, it's where the code is defined that matters
-
-// just creates an EmojiArt.EmojiInfo from a UILabel
-// is a failable initializer
-// returns nil if we can't create the EmojiInfo from the given UILabel
 
 extension EmojiArt.EmojiInfo
 {
