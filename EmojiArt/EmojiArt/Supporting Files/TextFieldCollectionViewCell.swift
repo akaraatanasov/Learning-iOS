@@ -2,8 +2,8 @@
 //  TextFieldCollectionViewCell.swift
 //  EmojiArt
 //
-//  Created by Alexander on 2.04.18.
-//  Copyright © 2018 Alexander. All rights reserved.
+//  Created by CS193p Instructor.
+//  Copyright © 2017 CS193p Instructor. All rights reserved.
 //
 
 import UIKit

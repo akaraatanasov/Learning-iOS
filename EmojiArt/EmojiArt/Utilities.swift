@@ -7,7 +7,8 @@
 
 import UIKit
 
-class ImageFetcher {
+class ImageFetcher
+{
     // Public API
     
     // To use, create with the closure you want called when the image is ready.
@@ -26,26 +27,7 @@ class ImageFetcher {
     //   otherwise the result of the fetch will be discarded and the handler never called.
     // In other words, keeping a strong pointer to your instance says "I'm still interested in its result."
     
-    private let handler: (URL, UIImage) -> Void
-    
-    private var fetchFailed = false { didSet { callHandlerIfNeeded() } }
-    
     var backup: UIImage? { didSet { callHandlerIfNeeded() } }
-
-    init(handler: @escaping (URL, UIImage) -> Void) {
-        self.handler = handler
-    }
-    
-    init(fetch url: URL, handler: @escaping (URL, UIImage) -> Void) {
-        self.handler = handler
-        fetch(url)
-    }
-    
-    private func callHandlerIfNeeded() {
-        if fetchFailed, let image = backup, let url = image.storeLocallyAsJPEG(named: String(Date().timeIntervalSinceReferenceDate)) {
-            handler(url, image)
-        }
-    }
     
     func fetch(_ url: URL) {
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
@@ -66,6 +48,24 @@ class ImageFetcher {
         }
     }
     
+    init(handler: @escaping (URL, UIImage) -> Void) {
+        self.handler = handler
+    }
+    
+    init(fetch url: URL, handler: @escaping (URL, UIImage) -> Void) {
+        self.handler = handler
+        fetch(url)
+    }
+    
+    // Private Implementation
+    
+    private let handler: (URL, UIImage) -> Void
+    private var fetchFailed = false { didSet { callHandlerIfNeeded() } }
+    private func callHandlerIfNeeded() {
+        if fetchFailed, let image = backup, let url = image.storeLocallyAsJPEG(named: String(Date().timeIntervalSinceReferenceDate)) {
+            handler(url, image)
+        }
+    }
 }
 
 extension URL {
@@ -88,7 +88,8 @@ extension URL {
     }
 }
 
-extension UIImage {
+extension UIImage
+{
     private static let localImagesDirectory = "UIImage.storeLocallyAsJPEG"
     
     static func urlToStoreLocallyAsJPEG(named: String) -> URL? {
@@ -130,6 +131,15 @@ extension UIImage {
         }
         return nil
     }
+
+    func scaled(by factor: CGFloat) -> UIImage? {
+        let newSize = CGSize(width: size.width * factor, height: size.height * factor)
+        UIGraphicsBeginImageContext(newSize)
+        draw(in: CGRect(origin: CGPoint.zero, size: newSize))
+        let image = UIGraphicsGetImageFromCurrentImageContext()
+        UIGraphicsEndImageContext()
+        return image
+    }
 }
 
 extension String {
@@ -165,7 +175,7 @@ extension NSAttributedString {
 
 extension String {
     func attributedString(withTextStyle style: UIFontTextStyle, ofSize size: CGFloat) -> NSAttributedString {
-        let font = UIFontMetrics(forTextStyle: .body).scaledFont(for: UIFont.preferredFont(forTextStyle: .body).withSize(size))
+        let font = UIFont.preferredFont(forTextStyle: style).withSize(size)
         return NSAttributedString(string: self, attributes: [.font:font])
     }
 }
@@ -211,5 +221,18 @@ extension UIView {
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
         return image
+    }
+}
+
+extension UIDocumentState: CustomStringConvertible {
+    public var description: String {
+        return [
+            UIDocumentState.normal.rawValue:".normal",
+            UIDocumentState.closed.rawValue:".closed",
+            UIDocumentState.inConflict.rawValue:".inConflict",
+            UIDocumentState.savingError.rawValue:".savingError",
+            UIDocumentState.editingDisabled.rawValue:".editingDisabled",
+            UIDocumentState.progressAvailable.rawValue:".progressAvailable"
+            ][rawValue] ?? String(rawValue)
     }
 }
