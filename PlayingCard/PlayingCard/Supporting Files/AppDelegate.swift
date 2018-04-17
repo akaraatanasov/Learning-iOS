@@ -2,8 +2,8 @@
 //  AppDelegate.swift
 //  PlayingCard
 //
-//  Created by Alexander on 23.01.18.
-//  Copyright © 2018 Alexander. All rights reserved.
+//  Created by CS193p Instructor on 10/9/17.
+//  Copyright © 2017 CS193p Instructor. All rights reserved.
 //
 
 import UIKit
