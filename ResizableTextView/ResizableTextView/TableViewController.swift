@@ -31,15 +31,7 @@ class TableViewController: UIViewController, UITableViewDataSource, UITableViewD
         
         cell.callBack = { textView in
             tableView.beginUpdates()
-            
-            var currentContentOffset = tableView.contentOffset
-            let textViewHeight = textView.frame.size.height
             textView.sizeToFit()
-            
-            let yDiff = textView.frame.size.height - textViewHeight
-            currentContentOffset.y += yDiff
-            tableView.contentOffset = currentContentOffset
-            
             tableView.endUpdates()
         }
         
