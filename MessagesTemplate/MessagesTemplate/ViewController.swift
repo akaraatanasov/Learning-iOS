@@ -7,9 +7,7 @@
 //
 
 // To-do:
-// 1. fix the bug with the selection - done
-// 1.1. Make the textfield a textview that resizes up to 4 lines
-
+// 1. Make the textfield a textview that resizes up to 4 lines - fix the constraint bug
 // 2. delete cell with the cell datasource method
 // 3. insert cell ??
 
@@ -31,6 +29,11 @@ class ViewController: UIViewController {
     
     var sendButtonAction: SendAction = .add
     var cellToEditIndex: Int = 0
+    var textAndButtonViewHeight: CGFloat = 0
+    var textAndButtonViewPosY: CGFloat = 0
+    var tableViewHeightConstraintConstant: CGFloat = 0
+    var textViewNumberOfLines: Int = 1
+    var firstCall = true
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -38,7 +41,7 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var textAndButtonView: UIView!
     
-    @IBOutlet weak var textField: UITextField!
+    @IBOutlet weak var textView: UITextView!
     
     @IBOutlet weak var sendButton: UIButton!
     
@@ -50,7 +53,10 @@ class ViewController: UIViewController {
     
     // MARK: - Private
     private func initialSetup() {
+        textAndButtonViewHeight = textAndButtonView.frame.height
+        textView.delegate = self
         sendButton.titleLabel?.textAlignment = .center
+        
         let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(self.longPress(longPressGestureRecognizer:)))
         tableView.addGestureRecognizer(longPressRecognizer)
         
@@ -95,16 +101,46 @@ class ViewController: UIViewController {
         }
         
         let keyboardHeight = keyboardSize.cgRectValue.height
-        let posY = self.textAndButtonView.frame.origin.y + (moveUp ? -keyboardHeight : keyboardHeight)
-        tableViewHeightConstraint.constant = tableViewHeightConstraint.constant + (moveUp ? -keyboardHeight : keyboardHeight)
+        textAndButtonViewPosY = self.textAndButtonView.frame.origin.y + (moveUp ? -keyboardHeight : keyboardHeight)
+        tableViewHeightConstraintConstant = tableViewHeightConstraint.constant + (moveUp ? -keyboardHeight : keyboardHeight)
+        tableViewHeightConstraint.constant = tableViewHeightConstraintConstant
+        
+        UIView.animate(withDuration: 0.25, animations: {
+            self.textAndButtonView.frame = CGRect(x: self.textAndButtonView.frame.origin.x, y: self.textAndButtonViewPosY, width: self.textAndButtonView.frame.size.width, height: self.textAndButtonView.frame.size.height)
+        });
+    }
+    
+    private func moveTextAndButtonViewWhenTyping(up moveUp: Bool) {
+        var textAndButtonViewCurrentHeight = textAndButtonView.frame.height
+        
+        var heightDifference = abs(textAndButtonViewCurrentHeight - textAndButtonViewHeight)
+        
+        if firstCall { // BIGGEST HACK - needed because on first call because of numbersOfLines() method fucks up the app
+            heightDifference += 16.5
+            firstCall = false
+        }
+        
+        var posY = self.textAndButtonView.frame.origin.y + (moveUp ? -heightDifference : heightDifference)
+        tableViewHeightConstraint.constant = tableViewHeightConstraint.constant + (moveUp ? -heightDifference : heightDifference)
+        
+        if textView.numberOfLines() == 1 { // this case is needed when the user has alot of lines and deletes them by holding the backspace button
+            posY = textAndButtonViewPosY
+            tableViewHeightConstraint.constant = tableViewHeightConstraintConstant
+            textAndButtonViewCurrentHeight = 33.5
+        }
         
         UIView.animate(withDuration: 0.25, animations: {
             self.textAndButtonView.frame = CGRect(x: self.textAndButtonView.frame.origin.x, y: posY, width: self.textAndButtonView.frame.size.width, height: self.textAndButtonView.frame.size.height)
         });
+        
+        textAndButtonViewHeight = textAndButtonViewCurrentHeight
     }
     
     private func editCell(at indexPath: IndexPath) {
-        textField.text = cellData[indexPath.row]
+        textView.text = cellData[indexPath.row]
+        if textView.numberOfLines() > textViewNumberOfLines {
+            moveTextAndButtonViewWhenTyping(up: true)
+        }
         cellToEditIndex = indexPath.row
         changeSendButton(toEdit: true)
     }
@@ -130,7 +166,7 @@ class ViewController: UIViewController {
     
     // MARK: - IBAction
     @IBAction func sendButton(_ sender: Any) {
-        if let text = textField.text, !text.isEmpty {
+        if let text = textView.text, !text.isEmpty {
             switch sendButtonAction {
             case .add:
                 cellData.append(text)
@@ -138,8 +174,12 @@ class ViewController: UIViewController {
                 cellData[cellToEditIndex] = text
                 changeSendButton(toEdit: false)
             }
-            textField.text = ""
+            textView.text = ""
         }
+        
+        moveTextAndButtonViewWhenTyping(up: false)
+        textViewNumberOfLines = 1
+        firstCall = true
     }
     
 }
@@ -164,10 +204,32 @@ extension ViewController: UITableViewDataSource {
     }
 }
 
-// MARK: - UITextFieldDelegate
-extension ViewController: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        self.view.endEditing(true)
+// MARK: - UITextViewDelegate
+extension ViewController: UITextViewDelegate {
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if (text == "\n") {
+            textView.resignFirstResponder()
+        }
         return true
+    }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        let currentNumberOfLines = textView.numberOfLines()
+        if currentNumberOfLines > textViewNumberOfLines {
+            moveTextAndButtonViewWhenTyping(up: true)
+        } else if currentNumberOfLines < textViewNumberOfLines {
+            moveTextAndButtonViewWhenTyping(up: false)
+        }
+        textViewNumberOfLines = currentNumberOfLines
+    }
+}
+
+// MARK: - UITextView number of lines method
+extension UITextView {
+    func numberOfLines() -> Int {
+        if let fontUnwrapped = self.font {
+            return Int(self.sizeThatFits(self.frame.size).height / fontUnwrapped.lineHeight)
+        }
+        return 0
     }
 }
