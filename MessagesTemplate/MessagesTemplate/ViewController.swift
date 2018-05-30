@@ -6,12 +6,6 @@
 //  Copyright © 2018 Alexander. All rights reserved.
 //
 
-// To-do:
-// 4. resize cells according the text size
-
-// read about push notifications
-// see the designs in cape capital
-
 import UIKit
 
 enum SendAction {
@@ -48,14 +42,16 @@ class ViewController: UIViewController {
     
     // MARK: - Private
     private func initialSetup() {
-        textView.delegate = self
-        sendButton.titleLabel?.textAlignment = .center
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(sender:)), name:NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(sender:)), name:NSNotification.Name.UIKeyboardWillHide, object: nil)
         
         let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(self.longPress(longPressGestureRecognizer:)))
         tableView.addGestureRecognizer(longPressRecognizer)
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 43.5
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(sender:)), name:NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(sender:)), name:NSNotification.Name.UIKeyboardWillHide, object: nil)
+        textView.delegate = self
+        sendButton.titleLabel?.textAlignment = .center
     }
     
     @objc private func longPress(longPressGestureRecognizer: UILongPressGestureRecognizer) {
@@ -163,8 +159,8 @@ extension ViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "messageCell", for: indexPath)
-        cell.textLabel?.text = cellData[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "messageCell", for: indexPath) as! ResizableTableViewCell
+        cell.cellLabel?.text = cellData[indexPath.row]
         return cell
     }
 }

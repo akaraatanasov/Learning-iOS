@@ -12,6 +12,7 @@
 		11170E0620B833D200FB45C8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 11170E0420B833D200FB45C8 /* Main.storyboard */; };
 		11170E0820B833D400FB45C8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 11170E0720B833D400FB45C8 /* Assets.xcassets */; };
 		11170E0B20B833D400FB45C8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 11170E0920B833D400FB45C8 /* LaunchScreen.storyboard */; };
+		11B784FA20BEEF1A00A5DFFE /* ResizableTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11B784F920BEEF1A00A5DFFE /* ResizableTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +23,7 @@
 		11170E0720B833D400FB45C8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		11170E0A20B833D400FB45C8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		11170E0C20B833D400FB45C8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		11B784F920BEEF1A00A5DFFE /* ResizableTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResizableTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +58,7 @@
 			children = (
 				11170E0020B833D200FB45C8 /* AppDelegate.swift */,
 				11170E0220B833D200FB45C8 /* ViewController.swift */,
+				11B784F920BEEF1A00A5DFFE /* ResizableTableViewCell.swift */,
 				11170E0420B833D200FB45C8 /* Main.storyboard */,
 				11170E0720B833D400FB45C8 /* Assets.xcassets */,
 				11170E0920B833D400FB45C8 /* LaunchScreen.storyboard */,
@@ -136,6 +139,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				11170E0320B833D200FB45C8 /* ViewController.swift in Sources */,
+				11B784FA20BEEF1A00A5DFFE /* ResizableTableViewCell.swift in Sources */,
 				11170E0120B833D200FB45C8 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
