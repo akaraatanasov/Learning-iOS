@@ -7,9 +7,10 @@
 //
 
 // To-do:
-// 1. Make the textfield a textview that resizes up to 4 lines - fix the constraint bug
-// 2. delete cell with the cell datasource method
-// 3. insert cell ??
+// 4. resize cells according the text size
+
+// read about push notifications
+// see the designs in cape capital
 
 import UIKit
 
@@ -19,27 +20,21 @@ enum SendAction {
 }
 
 class ViewController: UIViewController {
-    
-    var cellData = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eight"] {
-        didSet {
-            tableView.reloadData()
-            scrollToBottom()
+    // MARK: - Vars
+    var cellData = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eight"]
+    var sendButtonAction: SendAction = .add
+    var cellToEditIndex: IndexPath = IndexPath(item: 0, section: 0)
+    var lastCellIndex: IndexPath {
+        get {
+            return IndexPath(row: cellData.count - 1, section: 0)
         }
     }
     
-    var sendButtonAction: SendAction = .add
-    var cellToEditIndex: Int = 0
-    var textAndButtonViewHeight: CGFloat = 0
-    var textAndButtonViewPosY: CGFloat = 0
-    var tableViewHeightConstraintConstant: CGFloat = 0
-    var textViewNumberOfLines: Int = 1
-    var firstCall = true
-    
     @IBOutlet weak var tableView: UITableView!
     
-    @IBOutlet weak var tableViewHeightConstraint: NSLayoutConstraint!
-    
     @IBOutlet weak var textAndButtonView: UIView!
+    
+    @IBOutlet weak var textAndButtonViewBottomConstraint: NSLayoutConstraint!
     
     @IBOutlet weak var textView: UITextView!
     
@@ -53,7 +48,6 @@ class ViewController: UIViewController {
     
     // MARK: - Private
     private func initialSetup() {
-        textAndButtonViewHeight = textAndButtonView.frame.height
         textView.delegate = self
         sendButton.titleLabel?.textAlignment = .center
         
@@ -87,11 +81,11 @@ class ViewController: UIViewController {
         }
     }
     
-    @objc func keyboardWillShow(sender: Notification) {
+    @objc private func keyboardWillShow(sender: Notification) {
         moveTextAndButtonView(for: sender, up: true)
     }
     
-    @objc func keyboardWillHide(sender: Notification) {
+    @objc private func keyboardWillHide(sender: Notification) {
         moveTextAndButtonView(for: sender, up: false)
     }
     
@@ -101,57 +95,28 @@ class ViewController: UIViewController {
         }
         
         let keyboardHeight = keyboardSize.cgRectValue.height
-        textAndButtonViewPosY = self.textAndButtonView.frame.origin.y + (moveUp ? -keyboardHeight : keyboardHeight)
-        tableViewHeightConstraintConstant = tableViewHeightConstraint.constant + (moveUp ? -keyboardHeight : keyboardHeight)
-        tableViewHeightConstraint.constant = tableViewHeightConstraintConstant
+        textAndButtonViewBottomConstraint.constant = moveUp ? keyboardHeight : 0
         
-        UIView.animate(withDuration: 0.25, animations: {
-            self.textAndButtonView.frame = CGRect(x: self.textAndButtonView.frame.origin.x, y: self.textAndButtonViewPosY, width: self.textAndButtonView.frame.size.width, height: self.textAndButtonView.frame.size.height)
+        let keyboardAnimationDuration = sender.userInfo?[UIKeyboardAnimationDurationUserInfoKey] as? Double ?? 0.25
+        UIView.animate(withDuration: keyboardAnimationDuration, animations: { [weak self] in
+            self?.view.layoutIfNeeded()
         });
-    }
-    
-    private func moveTextAndButtonViewWhenTyping(up moveUp: Bool) {
-        var textAndButtonViewCurrentHeight = textAndButtonView.frame.height
-        
-        var heightDifference = abs(textAndButtonViewCurrentHeight - textAndButtonViewHeight)
-        
-        if firstCall { // BIGGEST HACK - needed because on first call because of numbersOfLines() method fucks up the app
-            heightDifference += 16.5
-            firstCall = false
-        }
-        
-        var posY = self.textAndButtonView.frame.origin.y + (moveUp ? -heightDifference : heightDifference)
-        tableViewHeightConstraint.constant = tableViewHeightConstraint.constant + (moveUp ? -heightDifference : heightDifference)
-        
-        if textView.numberOfLines() == 1 { // this case is needed when the user has alot of lines and deletes them by holding the backspace button
-            posY = textAndButtonViewPosY
-            tableViewHeightConstraint.constant = tableViewHeightConstraintConstant
-            textAndButtonViewCurrentHeight = 33.5
-        }
-        
-        UIView.animate(withDuration: 0.25, animations: {
-            self.textAndButtonView.frame = CGRect(x: self.textAndButtonView.frame.origin.x, y: posY, width: self.textAndButtonView.frame.size.width, height: self.textAndButtonView.frame.size.height)
-        });
-        
-        textAndButtonViewHeight = textAndButtonViewCurrentHeight
     }
     
     private func editCell(at indexPath: IndexPath) {
         textView.text = cellData[indexPath.row]
-        if textView.numberOfLines() > textViewNumberOfLines {
-            moveTextAndButtonViewWhenTyping(up: true)
-        }
-        cellToEditIndex = indexPath.row
+        cellToEditIndex = indexPath
+        tableView.scrollToRow(at: indexPath, at: UITableViewScrollPosition.bottom, animated: true)
         changeSendButton(toEdit: true)
     }
     
     private func deleteCell(at indexPath: IndexPath) {
         cellData.remove(at: indexPath.row)
+        tableView.deleteRows(at: [indexPath], with: .automatic)
     }
     
     private func scrollToBottom() {
-        let lastIndex = IndexPath(row: cellData.count - 1, section: 0)
-        self.tableView.scrollToRow(at: lastIndex, at: UITableViewScrollPosition.bottom, animated: true)
+        tableView.scrollToRow(at: lastCellIndex, at: UITableViewScrollPosition.bottom, animated: true)
     }
     
     private func changeSendButton(toEdit isEditButton: Bool) {
@@ -170,16 +135,16 @@ class ViewController: UIViewController {
             switch sendButtonAction {
             case .add:
                 cellData.append(text)
+                tableView.insertRows(at: [lastCellIndex], with: .automatic)
+                scrollToBottom()
             case .edit:
-                cellData[cellToEditIndex] = text
+                cellData[cellToEditIndex.row] = text
+                tableView.reloadRows(at: [cellToEditIndex], with: .automatic)
                 changeSendButton(toEdit: false)
             }
+            
             textView.text = ""
         }
-        
-        moveTextAndButtonViewWhenTyping(up: false)
-        textViewNumberOfLines = 1
-        firstCall = true
     }
     
 }
@@ -211,25 +176,5 @@ extension ViewController: UITextViewDelegate {
             textView.resignFirstResponder()
         }
         return true
-    }
-    
-    func textViewDidChange(_ textView: UITextView) {
-        let currentNumberOfLines = textView.numberOfLines()
-        if currentNumberOfLines > textViewNumberOfLines {
-            moveTextAndButtonViewWhenTyping(up: true)
-        } else if currentNumberOfLines < textViewNumberOfLines {
-            moveTextAndButtonViewWhenTyping(up: false)
-        }
-        textViewNumberOfLines = currentNumberOfLines
-    }
-}
-
-// MARK: - UITextView number of lines method
-extension UITextView {
-    func numberOfLines() -> Int {
-        if let fontUnwrapped = self.font {
-            return Int(self.sizeThatFits(self.frame.size).height / fontUnwrapped.lineHeight)
-        }
-        return 0
     }
 }

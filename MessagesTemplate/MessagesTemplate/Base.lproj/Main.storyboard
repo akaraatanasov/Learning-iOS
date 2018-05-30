@@ -4,7 +4,6 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -21,9 +20,6 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="dHI-Ge-J30">
                                 <rect key="frame" x="0.0" y="20" width="375" height="597"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="597" id="134-M6-v1p"/>
-                                </constraints>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="messageCell" id="NOp-v8-Dbn">
                                         <rect key="frame" x="0.0" y="28" width="375" height="44"/>
@@ -39,7 +35,7 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="JoL-dw-q9d"/>
                                 </connections>
                             </tableView>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="phb-Hi-rFx">
+                            <view contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" horizontalCompressionResistancePriority="751" verticalCompressionResistancePriority="751" translatesAutoresizingMaskIntoConstraints="NO" id="phb-Hi-rFx">
                                 <rect key="frame" x="0.0" y="617" width="375" height="50"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="W57-ef-E17">
@@ -70,6 +66,7 @@
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="phb-Hi-rFx" firstAttribute="leading" secondItem="dHI-Ge-J30" secondAttribute="leading" id="4dJ-bc-HYA"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="phb-Hi-rFx" secondAttribute="bottom" id="Hae-DR-qxP"/>
                             <constraint firstItem="phb-Hi-rFx" firstAttribute="trailing" secondItem="dHI-Ge-J30" secondAttribute="trailing" id="Hxv-AH-YJC"/>
                             <constraint firstItem="phb-Hi-rFx" firstAttribute="top" secondItem="dHI-Ge-J30" secondAttribute="bottom" id="LgK-wK-t6d"/>
                             <constraint firstItem="dHI-Ge-J30" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="onC-b3-7ed"/>
@@ -81,8 +78,8 @@
                     <connections>
                         <outlet property="sendButton" destination="W57-ef-E17" id="WrE-Sp-lEr"/>
                         <outlet property="tableView" destination="dHI-Ge-J30" id="ljh-RP-LTF"/>
-                        <outlet property="tableViewHeightConstraint" destination="134-M6-v1p" id="pN5-am-Rqz"/>
                         <outlet property="textAndButtonView" destination="phb-Hi-rFx" id="YYi-0O-q4F"/>
+                        <outlet property="textAndButtonViewBottomConstraint" destination="Hae-DR-qxP" id="k9B-Jr-aVh"/>
                         <outlet property="textView" destination="KWj-Eu-MXg" id="FQ0-T0-mpb"/>
                     </connections>
                 </viewController>
