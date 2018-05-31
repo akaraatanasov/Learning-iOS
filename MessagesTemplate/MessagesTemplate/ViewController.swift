@@ -6,6 +6,11 @@
 //  Copyright © 2018 Alexander. All rights reserved.
 //
 
+// To-do:
+
+// 3. Implement some sort of notifications - with actions and shit
+// 4. In-app notification
+
 import UIKit
 
 enum SendAction {
@@ -14,6 +19,7 @@ enum SendAction {
 }
 
 class ViewController: UIViewController {
+    
     // MARK: - Vars
     var cellData = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eight"]
     var sendButtonAction: SendAction = .add
@@ -36,53 +42,15 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
         initialSetup()
     }
     
     // MARK: - Private
     private func initialSetup() {
-        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(sender:)), name:NSNotification.Name.UIKeyboardWillShow, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(sender:)), name:NSNotification.Name.UIKeyboardWillHide, object: nil)
-        
-        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(self.longPress(longPressGestureRecognizer:)))
-        tableView.addGestureRecognizer(longPressRecognizer)
-        tableView.rowHeight = UITableViewAutomaticDimension
-        tableView.estimatedRowHeight = 43.5
-        
-        textView.delegate = self
+        addKeyboardNotifications()
+        addKeyboardDismissOnTapRecognizer()
+        addTableViewLongPressRecognizer()
         sendButton.titleLabel?.textAlignment = .center
-    }
-    
-    @objc private func longPress(longPressGestureRecognizer: UILongPressGestureRecognizer) {
-        if longPressGestureRecognizer.state == UIGestureRecognizerState.began {
-            let touchPoint = longPressGestureRecognizer.location(in: tableView)
-            if let indexPath = tableView.indexPathForRow(at: touchPoint) {
-                let alertController = UIAlertController(title: "Message options", message: "What would you like to do?", preferredStyle: .actionSheet)
-                
-                let editButton = UIAlertAction(title: "Edit", style: .default, handler: { action -> Void in
-                    self.editCell(at: indexPath)
-                })
-                let deleteButton = UIAlertAction(title: "Delete", style: .destructive, handler: { action -> Void in
-                    self.deleteCell(at: indexPath)
-                })
-                let cancelButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-                
-                alertController.addAction(editButton)
-                alertController.addAction(deleteButton)
-                alertController.addAction(cancelButton)
-                
-                present(alertController, animated: true, completion: nil)
-            }
-        }
-    }
-    
-    @objc private func keyboardWillShow(sender: Notification) {
-        moveTextAndButtonView(for: sender, up: true)
-    }
-    
-    @objc private func keyboardWillHide(sender: Notification) {
-        moveTextAndButtonView(for: sender, up: false)
     }
     
     private func moveTextAndButtonView(for sender: Notification, up moveUp: Bool) {
@@ -98,6 +66,20 @@ class ViewController: UIViewController {
             self?.view.layoutIfNeeded()
         });
     }
+
+    private func changeSendButton(toEdit isEditButton: Bool) {
+        if isEditButton {
+            sendButtonAction = .edit
+            sendButton.titleLabel?.text = "Edit"
+        } else {
+            sendButtonAction = .add
+            sendButton.titleLabel?.text = "Send"
+        }
+    }
+    
+    private func scrollToBottom() {
+        tableView.scrollToRow(at: lastCellIndex, at: UITableViewScrollPosition.bottom, animated: true)
+    }
     
     private func editCell(at indexPath: IndexPath) {
         textView.text = cellData[indexPath.row]
@@ -109,20 +91,6 @@ class ViewController: UIViewController {
     private func deleteCell(at indexPath: IndexPath) {
         cellData.remove(at: indexPath.row)
         tableView.deleteRows(at: [indexPath], with: .automatic)
-    }
-    
-    private func scrollToBottom() {
-        tableView.scrollToRow(at: lastCellIndex, at: UITableViewScrollPosition.bottom, animated: true)
-    }
-    
-    private func changeSendButton(toEdit isEditButton: Bool) {
-        if isEditButton {
-            sendButtonAction = .edit
-            sendButton.titleLabel?.text = "Edit"
-        } else {
-            sendButtonAction = .add
-            sendButton.titleLabel?.text = "Send"
-        }
     }
     
     // MARK: - IBAction
@@ -165,12 +133,60 @@ extension ViewController: UITableViewDataSource {
     }
 }
 
-// MARK: - UITextViewDelegate
-extension ViewController: UITextViewDelegate {
-    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
-        if (text == "\n") {
-            textView.resignFirstResponder()
+// MARK: - Initial setup methods
+extension ViewController {
+    // MARK: - Keyboard show/hide methods
+    private func addKeyboardNotifications() {
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow(sender:)), name:NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide(sender:)), name:NSNotification.Name.UIKeyboardWillHide, object: nil)
+    }
+    
+    @objc private func keyboardWillShow(sender: Notification) {
+        moveTextAndButtonView(for: sender, up: true)
+    }
+    
+    @objc private func keyboardWillHide(sender: Notification) {
+        moveTextAndButtonView(for: sender, up: false)
+    }
+    
+    // MARK: - Keyboard dismiss methods
+    private func addKeyboardDismissOnTapRecognizer() {
+        let tapOutsideKeyboard: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
+        tableView.addGestureRecognizer(tapOutsideKeyboard)
+    }
+    
+    @objc func dismissKeyboard() {
+        view.endEditing(true)
+    }
+    
+    // MARK: - TableView long-press methods
+    private func addTableViewLongPressRecognizer() {
+        let longPressRecognizer = UILongPressGestureRecognizer(target: self, action: #selector(longPress(longPressGestureRecognizer:)))
+        tableView.addGestureRecognizer(longPressRecognizer)
+        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.estimatedRowHeight = 43.5
+    }
+    
+    @objc private func longPress(longPressGestureRecognizer: UILongPressGestureRecognizer) {
+        if longPressGestureRecognizer.state == UIGestureRecognizerState.began {
+            let touchPoint = longPressGestureRecognizer.location(in: tableView)
+            if let indexPath = tableView.indexPathForRow(at: touchPoint) {
+                let alertController = UIAlertController(title: "Message options", message: "What would you like to do?", preferredStyle: .actionSheet)
+                
+                let editButton = UIAlertAction(title: "Edit", style: .default, handler: { action -> Void in
+                    self.editCell(at: indexPath)
+                })
+                let deleteButton = UIAlertAction(title: "Delete", style: .destructive, handler: { action -> Void in
+                    self.deleteCell(at: indexPath)
+                })
+                let cancelButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+                
+                alertController.addAction(editButton)
+                alertController.addAction(deleteButton)
+                alertController.addAction(cancelButton)
+                
+                present(alertController, animated: true, completion: nil)
+            }
         }
-        return true
     }
 }
