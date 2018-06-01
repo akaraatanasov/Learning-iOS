@@ -11,7 +11,7 @@
 // 1. Make the keyboard return key from "Done" to default one and to put new lines ✔️
 // 2. Make the keyboard be dismissed when tapping on the table view ✔️
 // 3. Implement push notifications with attachments and actions ✔️
-// 4. Add handlers to the notification actions
+// 4. Add handlers to the notification actions ✔️
 // 5. In-app notification
 
 import UIKit

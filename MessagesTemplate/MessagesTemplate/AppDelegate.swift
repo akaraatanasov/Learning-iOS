@@ -10,12 +10,13 @@ import UIKit
 import UserNotifications
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
+class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
     
     var window: UIWindow?
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
         registerForPushNotifications()
+        
         return true
     }
     
@@ -30,7 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func applicationWillEnterForeground(_ application: UIApplication) {
-        // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+        UIApplication.shared.applicationIconBadgeNumber = 0
     }
     
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -42,7 +43,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
     
     func registerForPushNotifications() {
-        UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
+        UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error) in
             print("Permission granted: \(granted)")
             guard granted else { return }
@@ -66,20 +67,60 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         print("Failed to register for remote notifications with error: \(error)")
     }
     
+    func userNotificationCenter(_ center: UNUserNotificationCenter,  willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (_ options:   UNNotificationPresentationOptions) -> Void) {
+        print("Handle push from foreground")
+        // custom code to handle push while app is in the foreground
+        print("\(notification.request.content.userInfo)")
+    }
+    
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
-        
-        switch response.actionIdentifier {
-        case "open":
-            print("Open action was chosen")
-        case "save":
-            print("Save action was chosen")
-        case "mute":
-            print("Mute action was chosen")
-        default:
-            print("No custom action identifiers chosen")
-        }
+        handleNotificationActionFrom(response: response)
         
         completionHandler()
     }   
+    
+}
+
+extension AppDelegate {
+    
+    private func handleNotificationActionFrom(response notificationResponse: UNNotificationResponse) {
+        switch notificationResponse.actionIdentifier {
+        case "open":
+            print("Open action was chosen")
+        case "save attachment":
+            print("Save action was chosen")
+            
+            let aps = notificationResponse.notification.request.content.userInfo["aps"] as! [String: Any]
+            let url = URL(string: aps["attachment-url"] as! String)!
+            
+            do {
+                let imageData = try Data(contentsOf: url)
+                saveToPhotoLibrary(thisImage: imageData)
+                presentSavedAlert()
+            } catch {
+                print (error.localizedDescription)
+            }
+        default:
+            print("No custom action identifiers chosen")
+        }
+    }
+    
+    private func saveToPhotoLibrary(thisImage imageData: Data) {
+        let image = UIImage(data: imageData)!
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
+    }
+    
+    private func presentSavedAlert() {
+        let alert = UIAlertController(title: "Saved", message: "Your image has been saved", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ok", style: .default)
+        alert.addAction(okAction)
+        
+        var hostVC = self.window?.rootViewController
+        while let next = hostVC?.presentedViewController {
+            hostVC = next
+        }
+        hostVC?.present(alert, animated: true, completion: nil)
+        
+    }
     
 }

@@ -22,7 +22,7 @@ class NotificationService: UNNotificationServiceExtension {
                 return
         }
         
-        addActions(withTitles: ["Open", "Save", "Mute"])
+        addActions(withTitles: ["Open", "Save attachment"])
         
         downloadImageFrom(url: attachmentURL) { (attachment) in
             if attachment != nil {
@@ -49,7 +49,7 @@ extension NotificationService {
         var actions = [UNNotificationAction]()
         
         titles.forEach {
-            actions.append(UNNotificationAction(identifier: $0.lowercased(), title: $0, options: []))
+            actions.append(UNNotificationAction(identifier: $0.lowercased(), title: $0, options: [.foreground]))
         }
         
         let category = UNNotificationCategory(identifier: "notificationWithActions", actions: actions, intentIdentifiers: [], options: [])
@@ -63,9 +63,9 @@ extension NotificationService {
                 return
             }
             
-            var urlPath = URL(fileURLWithPath: NSTemporaryDirectory())
+            let documentsDirectory = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
             let uniqueURLEnding = ProcessInfo.processInfo.globallyUniqueString + ".jpg"
-            urlPath = urlPath.appendingPathComponent(uniqueURLEnding)
+            let urlPath = documentsDirectory.appendingPathComponent(uniqueURLEnding)
             
             try? FileManager.default.moveItem(at: downloadedUrl, to: urlPath)
             do {
