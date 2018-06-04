@@ -1,0 +1,6 @@
+framework module Pods_MessagesTemplate {
+  umbrella header "Pods-MessagesTemplate-umbrella.h"
+
+  export *
+  module * { export * }
+}

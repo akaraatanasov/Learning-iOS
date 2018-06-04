@@ -1,0 +1,18 @@
+PODS:
+  - SwiftMessages (4.1.4):
+    - SwiftMessages/App (= 4.1.4)
+  - SwiftMessages/App (4.1.4)
+
+DEPENDENCIES:
+  - SwiftMessages (= 4.1.4)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - SwiftMessages
+
+SPEC CHECKSUMS:
+  SwiftMessages: 2c33fdee8b8f38dfc7e1036684456b505891da8c
+
+PODFILE CHECKSUM: 9f16740580413c16b9fc5c42cf49d661eeab0055
+
+COCOAPODS: 1.5.2

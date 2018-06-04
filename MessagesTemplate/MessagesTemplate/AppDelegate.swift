@@ -8,6 +8,7 @@
 
 import UIKit
 import UserNotifications
+import SwiftMessages
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterDelegate {
@@ -42,6 +43,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
     
+    // MARK: - Push Notifications
     func registerForPushNotifications() {
         UNUserNotificationCenter.current().delegate = self
         UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound, .badge]) { (granted, error) in
@@ -68,9 +70,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter,  willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (_ options:   UNNotificationPresentationOptions) -> Void) {
-        print("Handle push from foreground")
-        // custom code to handle push while app is in the foreground
-        print("\(notification.request.content.userInfo)")
+        showMessageFrom(notificationData: notification)
     }
     
     func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
@@ -81,7 +81,55 @@ class AppDelegate: UIResponder, UIApplicationDelegate, UNUserNotificationCenterD
     
 }
 
+// MARK: - Notification payload
+//{
+//    "aps": {
+//        "alert":{
+//            "title":"Some message",
+//            "body":"Hi, this is the first message I have ever send! Hope you like it! 🍓"
+//        },
+//        "category":"notificationWithActions",
+//        "badge":1,
+//        "sound":"default",
+//        "mutable-content": 1,
+//        "attachment-url": "https://tinyurl.com/y9exh3by"
+//    }
+//}
+
 extension AppDelegate {
+    
+    private func showMessageFrom(notificationData notification: UNNotification) {
+        var config = SwiftMessages.Config()
+        config.duration = .seconds(seconds: 3)
+        
+        let notificationView = MessageView.viewFromNib(layout: .cardView)
+        notificationView.configureTheme(.info)
+        notificationView.configureDropShadow()
+        
+        let aps = notification.request.content.userInfo["aps"] as! [String: Any]
+        let alert = aps["alert"] as! [String: Any]
+        let title = alert["title"] as? String
+        let body = alert["body"] as? String
+        var iconImage: UIImage?
+        
+        do {
+            if let url = aps["attachment-url"] as? String {
+                let imageData = try Data(contentsOf: URL(string: url)!)
+                let image = UIImage(data: imageData)!
+                iconImage = image
+            }
+        } catch {
+            print (error.localizedDescription)
+        }
+        
+        notificationView.configureContent(title: title, body: body, iconImage: iconImage, iconText: nil, buttonImage: nil, buttonTitle: "Save") { (button) in
+            UIImageWriteToSavedPhotosAlbum(iconImage!, nil, nil, nil)
+            self.presentSavedAlert()
+        }
+        notificationView.configureIcon(withSize: CGSize(width: 90, height: 90), contentMode: .scaleAspectFit)
+        
+        SwiftMessages.show(config: config, view: notificationView)
+    }
     
     private func handleNotificationActionFrom(response notificationResponse: UNNotificationResponse) {
         switch notificationResponse.actionIdentifier {
@@ -122,5 +170,4 @@ extension AppDelegate {
         hostVC?.present(alert, animated: true, completion: nil)
         
     }
-    
 }
