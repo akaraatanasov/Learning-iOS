@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="14113" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
+    <device id="watch42" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="watchOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14088"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="14033"/>
+    </dependencies>
+    <scenes>
+        <!--Interface Controller-->
+        <scene sceneID="aou-V4-d1y">
+            <objects>
+                <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="MoonRunnerWatchApp" customModuleProvider="target">
+                    <items>
+                        <group width="1" height="129" alignment="left" spacing="10" id="BUB-bc-ORF">
+                            <items>
+                                <label width="136" height="53" alignment="left" text="Heartrate: 00 BPM" textAlignment="left" id="Ysx-H3-Wnd"/>
+                            </items>
+                        </group>
+                        <button width="1" alignment="left" title="Start" id="BVu-WT-LgV">
+                            <connections>
+                                <action selector="startButton" destination="AgC-eL-Hgc" id="WX2-cI-yje"/>
+                            </connections>
+                        </button>
+                    </items>
+                    <connections>
+                        <outlet property="buttonOutlet" destination="BVu-WT-LgV" id="Fnx-XZ-1b5"/>
+                        <outlet property="heartRateLabel" destination="Ysx-H3-Wnd" id="oJY-Ov-azR"/>
+                    </connections>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="219.69230769230771" y="344.79487179487182"/>
+        </scene>
+    </scenes>
+</document>
