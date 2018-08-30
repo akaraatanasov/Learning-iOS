@@ -46,7 +46,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let locationManager = LocationManager.shared
     locationManager.requestWhenInUseAuthorization()
     
-//    healthStoreAuthorization()
     authorizeHealthKit { (authorized,  error) -> Void in
       if authorized {
         print("HealthKit authorization received.")
@@ -57,7 +56,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
           print("Error: \(error.localizedDescription)")
         }
       }
-      
     }
     
     return true
@@ -72,23 +70,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
   
   // MARK: - Private
-  
-  // MARK: - See these!!!
-  // SHOULD DELETE ONE OF THE TWO
-  //    ↓ probably this one ↓
-  private func healthStoreAuthorization() {
-    let typesToShare: Set = [
-      HKQuantityType.workoutType()
-    ]
-    
-    let typesToRead: Set = [
-      HKQuantityType.quantityType(forIdentifier: .heartRate)!
-    ]
-    
-    healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { (success, error) in
-      // Handle error
-    }
-  }
   
   private func authorizeHealthKit(completion: @escaping (_ success: Bool, _ error: NSError?) -> Void) {
     guard HKHealthStore.isHealthDataAvailable() else {
@@ -118,18 +99,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { (success, error) in
       DispatchQueue.main.async {
-        self.startObservingHeartRateChanges()
+        self.enableBackgroundDelivery(for: self.heartRateType)
       }
         
       completion(success, nil)
     }
-    
   }
   
-  private func startObservingHeartRateChanges() { // WITH BACKGROUND FETCH
-    healthStore.execute(createStreamingQuery())
-    
-    healthStore.enableBackgroundDelivery(for: heartRateType, frequency: .immediate) { (success, error) in
+  private func enableBackgroundDelivery(for type: HKQuantityType) {
+    healthStore.enableBackgroundDelivery(for: type, frequency: .immediate) { (success, error) in
       if success {
         print("Enabled background delivery of heart rate changes")
       } else {
@@ -139,34 +117,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
       }
     }
-    
-  }
-
-  func measureHeartRate() {
-    self.healthStore.execute(createStreamingQuery())
-  }
-
-  private func createStreamingQuery() -> HKQuery {
-    let predicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options: [])
-    let query = HKAnchoredObjectQuery(type: heartRateType, predicate: predicate, anchor: nil, limit: Int(HKObjectQueryNoLimit)) { (query, samples, deletedObjects, anchor, error) in
-      self.formatSamples(samples: samples)
-    }
-    
-    query.updateHandler = { (query, samples, deletedObjects, anchor, error) -> Void in
-      self.formatSamples(samples: samples)
-    }
-    
-    return query
   }
   
-  private func formatSamples(samples: [HKSample]?) {
-    guard let samples = samples as? [HKQuantitySample] else { return } // 0 elements?
-    guard let quantity = samples.last?.quantity else { return }
-    
-    let heartRate = HKUnit(from: "count/min")
-    let value = Int(quantity.doubleValue(for: heartRate))
-    print("HeartRate: \(value)")
-  }
   
 }
 

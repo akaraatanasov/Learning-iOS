@@ -34,13 +34,13 @@ import Foundation
 import HealthKit
 
 class InterfaceController: WKInterfaceController {
-
   // MARK: - Vars
   private let healthStore = HKHealthStore()
-  private var configuration: HKWorkoutConfiguration!
-  private var session: HKWorkoutSession!
+  private let workoutConfiguration = HKWorkoutConfiguration()
+  private var workoutSession: HKWorkoutSession!
+  private var heartRateQuery: HKAnchoredObjectQuery!
   
-  var startButtonIsPressed = false
+  private var startButtonIsPressed = false
   
   // MARK: - IBOutlet
   @IBOutlet var heartRateLabel: WKInterfaceLabel!
@@ -51,6 +51,7 @@ class InterfaceController: WKInterfaceController {
     super.didAppear()
     
     healthStoreAuthorization()
+    setupWorkoutSession(activityType: .running, locationType: .unknown)
   }
   
   // MARK: - Private
@@ -64,16 +65,52 @@ class InterfaceController: WKInterfaceController {
     ]
     
     healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { (success, error) in
-      // Handle error
+      if let theError = error {
+        print("Error: \(theError.localizedDescription)")
+      }
     }
   }
   
-  private func setupWorkoutSession() {
-  
+  private func setupWorkoutSession(activityType activity: HKWorkoutActivityType, locationType location: HKWorkoutSessionLocationType) {
+    workoutConfiguration.activityType = activity
+    workoutConfiguration.locationType = location
+    
+    do {
+      workoutSession = try HKWorkoutSession(configuration: workoutConfiguration)
+    } catch {
+      print("Error: \(error.localizedDescription)")
+    }
   }
   
   private func startWorkoutSession() {
+    let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
+    let predicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options: [])
+    
+    heartRateQuery = HKAnchoredObjectQuery(type: heartRateType, predicate: predicate, anchor: nil, limit: Int(HKObjectQueryNoLimit)) { (query, samples, deletedObjects, anchor, error) in
+      self.formatSamples(samples: samples)
+    }
+    
+    heartRateQuery.updateHandler = { (query, samples, deletedObjects, anchor, error) -> Void in
+      self.formatSamples(samples: samples)
+    }
+    
+    healthStore.start(workoutSession)
+    healthStore.execute(heartRateQuery)
+  }
   
+  private func stopWorkoutSession() {
+    healthStore.stop(heartRateQuery)
+    healthStore.end(workoutSession)
+  }
+  
+  private func formatSamples(samples: [HKSample]?) {
+    guard let samples = samples as? [HKQuantitySample] else { return }
+    guard let quantity = samples.last?.quantity else { return }
+    
+    let heartRate = HKUnit(from: "count/min")
+    let value = Int(quantity.doubleValue(for: heartRate))
+    print("HeartRate: \(value)")
+    heartRateLabel.setText("HeartRate: \(value) BPM")
   }
   
   // MARK: - IBAciton
@@ -82,16 +119,16 @@ class InterfaceController: WKInterfaceController {
     
     if startButtonIsPressed {
       buttonOutlet.setTitle("Stop")
-      
       heartRateLabel.setText("HeartRate: --- BPM")
     
-    
+      startWorkoutSession()
     } else {
       buttonOutlet.setTitle("Start")
       heartRateLabel.setText("HeartRate: 00 BPM")
     
-    
+      stopWorkoutSession()
     }
+    
   }
 
 }

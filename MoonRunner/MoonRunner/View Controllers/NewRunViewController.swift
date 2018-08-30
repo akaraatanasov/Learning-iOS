@@ -77,6 +77,10 @@ class NewRunViewController: UIViewController {
     return try! AVAudioPlayer(data: successSound.data)
   }()
   
+  private let healthStore = HKHealthStore()
+  private let workoutConfiguration = HKWorkoutConfiguration()
+  private var heartRateQuery: HKAnchoredObjectQuery! // to delete?
+  
   // MARK: - Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -84,7 +88,7 @@ class NewRunViewController: UIViewController {
     dataStackView.isHidden = true
     badgeStackView.isHidden = true
     
-    // add prepare for workout session
+    setupWorkoutSession(activityType: .running, locationType: .unknown)
   }
   
   override func viewWillDisappear(_ animated: Bool) {
@@ -142,7 +146,7 @@ class NewRunViewController: UIViewController {
       self.eachSecond()
     }
     startLocationUpdates()
-    startHeartRateUpdates()
+    startWorkoutSession()
   }
   
   private func stopRun() {
@@ -154,19 +158,51 @@ class NewRunViewController: UIViewController {
     badgeStackView.isHidden = true
     
     locationManager.stopUpdatingLocation()
-    stopHeartRateUpdates()
+    stopWorkoutSession()
   }
   
-  private func healthKitAuthorization() {
+  private func setupWorkoutSession(activityType activity: HKWorkoutActivityType, locationType location: HKWorkoutSessionLocationType) {
+    workoutConfiguration.activityType = activity
+    workoutConfiguration.locationType = location
+    
+    healthStore.startWatchApp(with: workoutConfiguration) { (success, error) in
+      print ("Watch App launched successfully: \(success)")
+      
+      if let theError = error {
+        print("Error: \(theError.localizedDescription)")
+      }
+    }
     
   }
   
-  private func startHeartRateUpdates() {
-//    let builder = HKWorkout
+  private func startWorkoutSession() {
+    let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
+    let predicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options: [])
+    
+    heartRateQuery = HKAnchoredObjectQuery(type: heartRateType, predicate: predicate, anchor: nil, limit: Int(HKObjectQueryNoLimit)) { (query, samples, deletedObjects, anchor, error) in
+      self.formatSamples(samples: samples)
+    }
+    
+    heartRateQuery.updateHandler = { (query, samples, deletedObjects, anchor, error) -> Void in
+      self.formatSamples(samples: samples)
+    }
+    
+//    healthStore.start(workoutSession)
+    healthStore.execute(heartRateQuery)
   }
   
-  private func stopHeartRateUpdates() {
+  private func stopWorkoutSession() {
+    healthStore.stop(heartRateQuery)
+//    healthStore.end(workoutSession)
+  }
+  
+  private func formatSamples(samples: [HKSample]?) {
+    guard let samples = samples as? [HKQuantitySample] else { return } // 0 elements?
+    guard let quantity = samples.last?.quantity else { return }
     
+    let heartRate = HKUnit(from: "count/min")
+    let value = Int(quantity.doubleValue(for: heartRate))
+    print("HeartRate: \(value) BPM")
   }
   
   func eachSecond() {
@@ -228,6 +264,7 @@ class NewRunViewController: UIViewController {
       AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)
     }
   }
+  
 }
 
 // MARK: - Navigation

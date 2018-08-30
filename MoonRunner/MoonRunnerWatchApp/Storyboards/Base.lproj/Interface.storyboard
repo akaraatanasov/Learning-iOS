@@ -16,7 +16,7 @@
                     <items>
                         <group width="1" height="129" alignment="left" spacing="10" id="BUB-bc-ORF">
                             <items>
-                                <label width="136" height="53" alignment="left" text="Heartrate: 00 BPM" textAlignment="left" id="Ysx-H3-Wnd"/>
+                                <label width="136" height="53" alignment="left" text="HeartRate: 00 BPM" textAlignment="left" id="Ysx-H3-Wnd"/>
                             </items>
                         </group>
                         <button width="1" alignment="left" title="Start" id="BVu-WT-LgV">

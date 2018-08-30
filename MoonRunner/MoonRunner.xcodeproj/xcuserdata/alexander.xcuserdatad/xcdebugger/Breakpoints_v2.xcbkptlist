@@ -9,12 +9,12 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MoonRunner/AppDelegate.swift"
-            timestampString = "557269858.106019"
+            filePath = "MoonRunner/View Controllers/NewRunViewController.swift"
+            timestampString = "557323190.378643"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "168"
-            endingLineNumber = "168"
+            startingLineNumber = "201"
+            endingLineNumber = "201"
             landmarkName = "formatSamples(samples:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -25,12 +25,12 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MoonRunner/AppDelegate.swift"
-            timestampString = "557269858.106989"
+            filePath = "MoonRunner/View Controllers/NewRunViewController.swift"
+            timestampString = "557323190.379087"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "163"
-            endingLineNumber = "163"
+            startingLineNumber = "200"
+            endingLineNumber = "200"
             landmarkName = "formatSamples(samples:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -41,13 +41,29 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "MoonRunner/AppDelegate.swift"
-            timestampString = "557269858.107195"
+            filePath = "MoonRunner/View Controllers/NewRunViewController.swift"
+            timestampString = "557323190.379333"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "164"
-            endingLineNumber = "164"
-            landmarkName = "formatSamples(samples:)"
+            startingLineNumber = "195"
+            endingLineNumber = "195"
+            landmarkName = "stopWorkoutSession()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "MoonRunner/View Controllers/NewRunViewController.swift"
+            timestampString = "557323190.379608"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "191"
+            endingLineNumber = "191"
+            landmarkName = "startWorkoutSession()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
