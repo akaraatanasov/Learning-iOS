@@ -32,13 +32,17 @@
 import WatchKit
 import Foundation
 import HealthKit
+import WatchConnectivity
 
 class InterfaceController: WKInterfaceController {
+  
   // MARK: - Vars
   private let healthStore = HKHealthStore()
   private let workoutConfiguration = HKWorkoutConfiguration()
   private var workoutSession: HKWorkoutSession!
   private var heartRateQuery: HKAnchoredObjectQuery!
+  
+  private var wcSession: WCSession!
   
   private var startButtonIsPressed = false
   
@@ -47,6 +51,12 @@ class InterfaceController: WKInterfaceController {
   @IBOutlet var buttonOutlet: WKInterfaceButton!
   
   // MARK: - Lifecycle
+  override func willActivate() {
+    super.willActivate()
+    
+    setupWatchConnectivity()
+  }
+  
   override func didAppear() {
     super.didAppear()
     
@@ -69,6 +79,12 @@ class InterfaceController: WKInterfaceController {
         print("Error: \(theError.localizedDescription)")
       }
     }
+  }
+  
+  private func setupWatchConnectivity() {
+    wcSession = WCSession.default
+    wcSession.delegate = self
+    wcSession.activate()
   }
   
   private func setupWorkoutSession(activityType activity: HKWorkoutActivityType, locationType location: HKWorkoutSessionLocationType) {
@@ -108,9 +124,16 @@ class InterfaceController: WKInterfaceController {
     guard let quantity = samples.last?.quantity else { return }
     
     let heartRate = HKUnit(from: "count/min")
-    let value = Int(quantity.doubleValue(for: heartRate))
-    print("HeartRate: \(value)")
-    heartRateLabel.setText("HeartRate: \(value) BPM")
+    let heartRateValue = Int(quantity.doubleValue(for: heartRate))
+    print("HeartRate: \(heartRateValue) BPM")
+    heartRateLabel.setText("HeartRate: \(heartRateValue) BPM")
+    sendHeartRate(with: heartRateValue)
+  }
+  
+  private func sendHeartRate(with heartRateValue: Int) {
+    wcSession.sendMessage(["heartRate": heartRateValue], replyHandler: nil) { (error) in
+      print("Error: \(error.localizedDescription)")
+    }
   }
   
   // MARK: - IBAciton
@@ -132,3 +155,24 @@ class InterfaceController: WKInterfaceController {
   }
 
 }
+
+// MARK: - WCSessionDelegate
+extension InterfaceController: WCSessionDelegate {
+  func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+    print("Session activation completed with state: \(activationState.rawValue)")
+  }
+  
+  func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+    if let workoutSessionWasStarted = message["startWorkoutSession"] as? Bool {
+      if workoutSessionWasStarted {
+        
+        startWorkoutSession()
+      } else {
+        
+        stopWorkoutSession()
+      }
+    }
+    
+  }
+}
+

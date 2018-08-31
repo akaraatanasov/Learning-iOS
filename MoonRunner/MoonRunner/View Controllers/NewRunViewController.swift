@@ -33,6 +33,7 @@ import MapKit
 import HealthKit
 import CoreLocation
 import AVFoundation
+import WatchConnectivity
 
 class NewRunViewController: UIViewController {
   // MARK: - IBOutlets
@@ -42,6 +43,7 @@ class NewRunViewController: UIViewController {
   @IBOutlet weak var distanceLabel: UILabel!
   @IBOutlet weak var timeLabel: UILabel!
   @IBOutlet weak var paceLabel: UILabel!
+  @IBOutlet weak var heartRateLabel: UILabel!
   
   @IBOutlet weak var mapContainerView: UIView!
   @IBOutlet weak var mapView: MKMapView!
@@ -81,6 +83,8 @@ class NewRunViewController: UIViewController {
   private let workoutConfiguration = HKWorkoutConfiguration()
   private var heartRateQuery: HKAnchoredObjectQuery! // to delete?
   
+  private var wcSession: WCSession!
+  
   // MARK: - Lifecycle
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -88,7 +92,8 @@ class NewRunViewController: UIViewController {
     dataStackView.isHidden = true
     badgeStackView.isHidden = true
     
-    setupWorkoutSession(activityType: .running, locationType: .unknown)
+    setupWatchConnectivity()
+//    setupWorkoutSession(activityType: .running, locationType: .unknown)
   }
   
   override func viewWillDisappear(_ animated: Bool) {
@@ -142,11 +147,17 @@ class NewRunViewController: UIViewController {
     badgeImageView.image = UIImage(named: upcomingBadge.imageName)
     
     updateDisplay()
+    
+    DispatchQueue.main.async {
+      self.heartRateLabel.text = "HeartRate: -- BPM"
+    }
+    
     timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { _ in
       self.eachSecond()
     }
     startLocationUpdates()
-    startWorkoutSession()
+//    startWorkoutSession()
+    sendInitialMessage() // heart rate method
   }
   
   private func stopRun() {
@@ -158,7 +169,14 @@ class NewRunViewController: UIViewController {
     badgeStackView.isHidden = true
     
     locationManager.stopUpdatingLocation()
-    stopWorkoutSession()
+//    stopWorkoutSession()
+    sendDestructiveMessage()
+  }
+  
+  private func setupWatchConnectivity() {
+    wcSession = WCSession.default
+    wcSession.delegate = self
+    wcSession.activate()
   }
   
   private func setupWorkoutSession(activityType activity: HKWorkoutActivityType, locationType location: HKWorkoutSessionLocationType) {
@@ -194,6 +212,19 @@ class NewRunViewController: UIViewController {
   private func stopWorkoutSession() {
     healthStore.stop(heartRateQuery)
 //    healthStore.end(workoutSession)
+//    end the watch connectivity session?
+  }
+  
+  private func sendInitialMessage() {
+    wcSession.sendMessage(["startWorkoutSession" : true], replyHandler: nil) { (error) in
+        print("Error: \(error.localizedDescription)")
+    }
+  }
+  
+  private func sendDestructiveMessage() {
+    wcSession.sendMessage(["startWorkoutSession" : false], replyHandler: nil) { (error) in
+      print("Error: \(error.localizedDescription)")
+    }
   }
   
   private func formatSamples(samples: [HKSample]?) {
@@ -265,6 +296,30 @@ class NewRunViewController: UIViewController {
     }
   }
   
+}
+
+// MARK: - Watch Conectivity Session Delegate
+extension NewRunViewController: WCSessionDelegate {
+  func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+    print("Watch session activation completed with state: \(activationState.rawValue)")
+  }
+  
+  func sessionDidBecomeInactive(_ session: WCSession) {
+    print("Watch session became inactive")
+  }
+  
+  func sessionDidDeactivate(_ session: WCSession) {
+    print("Watch session became deactivated")
+  }
+  
+  func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+    if let heartRateValue = message["heartRate"] as? Int {
+      print("HeartRate: \(heartRateValue) BPM")
+      DispatchQueue.main.async {
+        self.heartRateLabel.text = "HeartRate: \(heartRateValue) BPM"
+      }
+    }
+  }
 }
 
 // MARK: - Navigation
