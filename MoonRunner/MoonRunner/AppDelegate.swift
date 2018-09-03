@@ -30,6 +30,7 @@
 
 import UIKit
 import HealthKit
+import WatchConnectivity
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -57,7 +58,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         }
       }
     }
-    
+
     return true
   }
   
@@ -119,6 +120,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
   }
   
+  private func setupWatchConnectivitySession() {
+    
+  }
   
 }
 

@@ -81,7 +81,7 @@ class InterfaceController: WKInterfaceController {
     }
   }
   
-  private func setupWatchConnectivity() {
+  private func setupWatchConnectivity() { // move this shit in the ExtensionDelegate probably?
     wcSession = WCSession.default
     wcSession.delegate = self
     wcSession.activate()
@@ -125,7 +125,7 @@ class InterfaceController: WKInterfaceController {
     
     let heartRate = HKUnit(from: "count/min")
     let heartRateValue = Int(quantity.doubleValue(for: heartRate))
-    print("HeartRate: \(heartRateValue) BPM")
+    print("HeartRate (watchOS): \(heartRateValue) BPM")
     heartRateLabel.setText("HeartRate: \(heartRateValue) BPM")
     sendHeartRate(with: heartRateValue)
   }
@@ -136,22 +136,31 @@ class InterfaceController: WKInterfaceController {
     }
   }
   
-  // MARK: - IBAciton
-  @IBAction func startButton() {
-    startButtonIsPressed = !startButtonIsPressed
-    
-    if startButtonIsPressed {
+  private func startNewRun(withState runIsStarted: Bool) {
+    wcSession.sendMessage(["startRun": runIsStarted], replyHandler: nil) { (error) in
+      print("Error: \(error.localizedDescription)")
+    }
+  }
+  
+  private func startWorkout(withState workoutIsStarted: Bool) {
+    if workoutIsStarted {
       buttonOutlet.setTitle("Stop")
-      heartRateLabel.setText("HeartRate: --- BPM")
-    
+      heartRateLabel.setText("HeartRate: -- BPM")
+      
       startWorkoutSession()
     } else {
       buttonOutlet.setTitle("Start")
       heartRateLabel.setText("HeartRate: 00 BPM")
-    
+      // TODO: send stop message to the iOS app !!!!!!!!!!
       stopWorkoutSession()
     }
-    
+  }
+  
+  // MARK: - IBAciton
+  @IBAction func startButton() {
+    startButtonIsPressed = !startButtonIsPressed
+    startNewRun(withState: startButtonIsPressed)
+//    startWorkout(withState: startButtonIsPressed)
   }
 
 }
@@ -164,15 +173,9 @@ extension InterfaceController: WCSessionDelegate {
   
   func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
     if let workoutSessionWasStarted = message["startWorkoutSession"] as? Bool {
-      if workoutSessionWasStarted {
-        
-        startWorkoutSession()
-      } else {
-        
-        stopWorkoutSession()
-      }
+      startButtonIsPressed = workoutSessionWasStarted
+      startWorkout(withState: workoutSessionWasStarted)
     }
     
   }
 }
-

@@ -93,7 +93,7 @@ class NewRunViewController: UIViewController {
     badgeStackView.isHidden = true
     
     setupWatchConnectivity()
-//    setupWorkoutSession(activityType: .running, locationType: .unknown)
+    startWatchApp(withActivity: .running, andLocation: .unknown)
   }
   
   override func viewWillDisappear(_ animated: Bool) {
@@ -101,8 +101,7 @@ class NewRunViewController: UIViewController {
     
     timer?.invalidate()
     locationManager.stopUpdatingLocation()
-    // add end workout session
-    
+    manageWatchWorkoutSession(startWorkout: false)
   }
   
   @IBAction func startTapped() {
@@ -156,8 +155,7 @@ class NewRunViewController: UIViewController {
       self.eachSecond()
     }
     startLocationUpdates()
-//    startWorkoutSession()
-    sendInitialMessage() // heart rate method
+    manageWatchWorkoutSession(startWorkout: true)
   }
   
   private func stopRun() {
@@ -169,8 +167,7 @@ class NewRunViewController: UIViewController {
     badgeStackView.isHidden = true
     
     locationManager.stopUpdatingLocation()
-//    stopWorkoutSession()
-    sendDestructiveMessage()
+    manageWatchWorkoutSession(startWorkout: false)
   }
   
   private func setupWatchConnectivity() {
@@ -179,7 +176,7 @@ class NewRunViewController: UIViewController {
     wcSession.activate()
   }
   
-  private func setupWorkoutSession(activityType activity: HKWorkoutActivityType, locationType location: HKWorkoutSessionLocationType) {
+  private func startWatchApp(withActivity activity: HKWorkoutActivityType, andLocation location: HKWorkoutSessionLocationType) {
     workoutConfiguration.activityType = activity
     workoutConfiguration.locationType = location
     
@@ -193,47 +190,10 @@ class NewRunViewController: UIViewController {
     
   }
   
-  private func startWorkoutSession() {
-    let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
-    let predicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options: [])
-    
-    heartRateQuery = HKAnchoredObjectQuery(type: heartRateType, predicate: predicate, anchor: nil, limit: Int(HKObjectQueryNoLimit)) { (query, samples, deletedObjects, anchor, error) in
-      self.formatSamples(samples: samples)
-    }
-    
-    heartRateQuery.updateHandler = { (query, samples, deletedObjects, anchor, error) -> Void in
-      self.formatSamples(samples: samples)
-    }
-    
-//    healthStore.start(workoutSession)
-    healthStore.execute(heartRateQuery)
-  }
-  
-  private func stopWorkoutSession() {
-    healthStore.stop(heartRateQuery)
-//    healthStore.end(workoutSession)
-//    end the watch connectivity session?
-  }
-  
-  private func sendInitialMessage() {
-    wcSession.sendMessage(["startWorkoutSession" : true], replyHandler: nil) { (error) in
+  private func manageWatchWorkoutSession(startWorkout message: Bool) {
+    wcSession.sendMessage(["startWorkoutSession" : message], replyHandler: nil) { (error) in
         print("Error: \(error.localizedDescription)")
     }
-  }
-  
-  private func sendDestructiveMessage() {
-    wcSession.sendMessage(["startWorkoutSession" : false], replyHandler: nil) { (error) in
-      print("Error: \(error.localizedDescription)")
-    }
-  }
-  
-  private func formatSamples(samples: [HKSample]?) {
-    guard let samples = samples as? [HKQuantitySample] else { return } // 0 elements?
-    guard let quantity = samples.last?.quantity else { return }
-    
-    let heartRate = HKUnit(from: "count/min")
-    let value = Int(quantity.doubleValue(for: heartRate))
-    print("HeartRate: \(value) BPM")
   }
   
   func eachSecond() {
@@ -313,13 +273,22 @@ extension NewRunViewController: WCSessionDelegate {
   }
   
   func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+    // Heart rate messages
     if let heartRateValue = message["heartRate"] as? Int {
-      print("HeartRate: \(heartRateValue) BPM")
+      print("HeartRate (iOS): \(heartRateValue) BPM")
       DispatchQueue.main.async {
         self.heartRateLabel.text = "HeartRate: \(heartRateValue) BPM"
       }
     }
+    
+    // Start/stop run
+    if let startNewRun = message["startRun"] as? Bool {
+      DispatchQueue.main.async {
+        startNewRun ? self.startRun() : self.stopTapped()
+      }
+    }
   }
+  
 }
 
 // MARK: - Navigation
