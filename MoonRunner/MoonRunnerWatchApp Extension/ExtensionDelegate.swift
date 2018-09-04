@@ -30,44 +30,110 @@
  */
 
 import WatchKit
+import HealthKit
+import WatchConnectivity
 
-class ExtensionDelegate: NSObject, WKExtensionDelegate {
+protocol WorkoutSessionDelegate: class {
+  func pass(workoutSession session: HKWorkoutSession)
+}
 
-    func applicationDidFinishLaunching() {
-        // Perform any final initialization of your application.
+class ExtensionDelegate: NSObject {
+  
+  // MARK: - Vars
+  private let healthStore = HKHealthStore()
+  private let wcSession = WCSession.isSupported() ? WCSession.default : nil
+  
+  weak var delegate: WorkoutSessionDelegate?
+  
+  // MARK: - Lifecycle
+  func applicationDidFinishLaunching() {
+    healthStoreAuthorization()
+    setupWatchConnectivity()
+  }
+  
+  func applicationDidBecomeActive() {
+    // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+  }
+  
+  func applicationWillResignActive() {
+    // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
+    // Use this method to pause ongoing tasks, disable timers, etc.
+  }
+  
+  func handle(_ backgroundTasks: Set<WKRefreshBackgroundTask>) {
+    // Sent when the system needs to launch the application in the background to process tasks. Tasks arrive in a set, so loop through and process each one.
+    for task in backgroundTasks {
+      // Use a switch statement to check the task type
+      switch task {
+      case let backgroundTask as WKApplicationRefreshBackgroundTask:
+        // Be sure to complete the background task once you’re done.
+        backgroundTask.setTaskCompletedWithSnapshot(false)
+      case let snapshotTask as WKSnapshotRefreshBackgroundTask:
+        // Snapshot tasks have a unique completion call, make sure to set your expiration date
+        snapshotTask.setTaskCompleted(restoredDefaultState: true, estimatedSnapshotExpiration: Date.distantFuture, userInfo: nil)
+      case let connectivityTask as WKWatchConnectivityRefreshBackgroundTask:
+        // Be sure to complete the connectivity task once you’re done.
+        connectivityTask.setTaskCompletedWithSnapshot(false)
+      case let urlSessionTask as WKURLSessionRefreshBackgroundTask:
+        // Be sure to complete the URL session task once you’re done.
+        urlSessionTask.setTaskCompletedWithSnapshot(false)
+      default:
+        // make sure to complete unhandled task types
+        task.setTaskCompletedWithSnapshot(false)
+      }
     }
-
-    func applicationDidBecomeActive() {
-        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+  }
+  
+  // MARK: - Private
+  private func healthStoreAuthorization() {
+    let typesToShare: Set = [
+      HKQuantityType.workoutType()
+    ]
+    
+    let typesToRead: Set = [
+      HKQuantityType.quantityType(forIdentifier: .heartRate)!
+    ]
+    
+    healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { (success, error) in
+      if let theError = error {
+        print("Error: \(theError.localizedDescription)")
+      }
     }
+  }
+  
+  private func setupWatchConnectivity() {
+    wcSession?.delegate = self
+    wcSession?.activate()
+  }
+  
+}
 
-    func applicationWillResignActive() {
-        // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-        // Use this method to pause ongoing tasks, disable timers, etc.
+extension ExtensionDelegate: WKExtensionDelegate {
+  func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
+    do {
+      let workoutSession = try HKWorkoutSession(configuration: workoutConfiguration)
+      delegate?.pass(workoutSession: workoutSession)
+    } catch {
+      print("Error: \(error.localizedDescription)")
     }
+  }
+}
 
-    func handle(_ backgroundTasks: Set<WKRefreshBackgroundTask>) {
-        // Sent when the system needs to launch the application in the background to process tasks. Tasks arrive in a set, so loop through and process each one.
-        for task in backgroundTasks {
-            // Use a switch statement to check the task type
-            switch task {
-            case let backgroundTask as WKApplicationRefreshBackgroundTask:
-                // Be sure to complete the background task once you’re done.
-                backgroundTask.setTaskCompletedWithSnapshot(false)
-            case let snapshotTask as WKSnapshotRefreshBackgroundTask:
-                // Snapshot tasks have a unique completion call, make sure to set your expiration date
-                snapshotTask.setTaskCompleted(restoredDefaultState: true, estimatedSnapshotExpiration: Date.distantFuture, userInfo: nil)
-            case let connectivityTask as WKWatchConnectivityRefreshBackgroundTask:
-                // Be sure to complete the connectivity task once you’re done.
-                connectivityTask.setTaskCompletedWithSnapshot(false)
-            case let urlSessionTask as WKURLSessionRefreshBackgroundTask:
-                // Be sure to complete the URL session task once you’re done.
-                urlSessionTask.setTaskCompletedWithSnapshot(false)
-            default:
-                // make sure to complete unhandled task types
-                task.setTaskCompletedWithSnapshot(false)
-            }
-        }
+// MARK: - Watch Conectivity Session Delegate
+extension ExtensionDelegate: WCSessionDelegate {
+  func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+    var stateToPrint = ""
+    
+    switch activationState {
+    case .notActivated: stateToPrint = ".notActivated"
+    case .inactive: stateToPrint = ".inactive"
+    case .activated: stateToPrint = ".activated"
     }
-
+    
+    print("Session activation completed with state: \(stateToPrint)")
+  }
+  
+  func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "phoneMessageReceived"), object: self, userInfo: message)
+  }
 }

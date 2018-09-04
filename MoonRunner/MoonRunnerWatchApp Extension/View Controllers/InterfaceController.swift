@@ -38,65 +38,63 @@ class InterfaceController: WKInterfaceController {
   
   // MARK: - Vars
   private let healthStore = HKHealthStore()
-  private let workoutConfiguration = HKWorkoutConfiguration()
-  private var workoutSession: HKWorkoutSession!
-  private var heartRateQuery: HKAnchoredObjectQuery!
-  
-  private var wcSession: WCSession!
+  private let wcSession = WCSession.default
+  private var workoutSession: HKWorkoutSession?
+  private var heartRateQuery: HKAnchoredObjectQuery?
   
   private var startButtonIsPressed = false
+  
+  var delegate: WorkoutSessionDelegate?
   
   // MARK: - IBOutlet
   @IBOutlet var heartRateLabel: WKInterfaceLabel!
   @IBOutlet var buttonOutlet: WKInterfaceButton!
   
   // MARK: - Lifecycle
-  override func willActivate() {
-    super.willActivate()
-    
-    setupWatchConnectivity()
-  }
-  
   override func didAppear() {
     super.didAppear()
+  
+//    if let extensionDelegate = WKExtension.shared().delegate as? ExtensionDelegate {
+//      if extensionDelegate.workoutSession != nil {
+//        workoutSession = extensionDelegate.workoutSession
+//      } else {
+//        setupWorkoutSession(activityType: .running, locationType: .unknown)
+//      }
+//    }
     
-    healthStoreAuthorization()
-    setupWorkoutSession(activityType: .running, locationType: .unknown)
+    if let extensionDelegate = WKExtension.shared().delegate as? ExtensionDelegate {
+      extensionDelegate.delegate = self
+    }
+    
+    NotificationCenter.default.addObserver(self, selector: #selector(phoneMessageReceived), name: NSNotification.Name(rawValue: "phoneMessageReceived"), object: nil)
   }
   
   // MARK: - Private
-  private func healthStoreAuthorization() {
-    let typesToShare: Set = [
-      HKQuantityType.workoutType()
-    ]
-    
-    let typesToRead: Set = [
-      HKQuantityType.quantityType(forIdentifier: .heartRate)!
-    ]
-    
-    healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { (success, error) in
-      if let theError = error {
-        print("Error: \(theError.localizedDescription)")
-      }
+  @objc private func phoneMessageReceived(notification: Notification) {
+    guard let message = notification.userInfo else {
+      return
     }
+    
+    // Start/stop workout session
+    if let workoutSessionWasStarted = message["startWorkoutSession"] as? Bool {
+      startButtonIsPressed = workoutSessionWasStarted
+      startWorkout(withState: workoutSessionWasStarted)
+    }
+    
   }
   
-  private func setupWatchConnectivity() { // move this shit in the ExtensionDelegate probably?
-    wcSession = WCSession.default
-    wcSession.delegate = self
-    wcSession.activate()
-  }
-  
-  private func setupWorkoutSession(activityType activity: HKWorkoutActivityType, locationType location: HKWorkoutSessionLocationType) {
-    workoutConfiguration.activityType = activity
-    workoutConfiguration.locationType = location
-    
-    do {
-      workoutSession = try HKWorkoutSession(configuration: workoutConfiguration)
-    } catch {
-      print("Error: \(error.localizedDescription)")
-    }
-  }
+//  private func setupWorkoutSession(activityType activity: HKWorkoutActivityType, locationType location: HKWorkoutSessionLocationType) {
+//    let workoutConfiguration = HKWorkoutConfiguration()
+//
+//    workoutConfiguration.activityType = activity
+//    workoutConfiguration.locationType = location
+//
+//    do {
+//      workoutSession = try HKWorkoutSession(configuration: workoutConfiguration)
+//    } catch {
+//      print("Error: \(error.localizedDescription)")
+//    }
+//  }
   
   private func startWorkoutSession() {
     let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
@@ -106,17 +104,21 @@ class InterfaceController: WKInterfaceController {
       self.formatSamples(samples: samples)
     }
     
-    heartRateQuery.updateHandler = { (query, samples, deletedObjects, anchor, error) -> Void in
+    heartRateQuery?.updateHandler = { (query, samples, deletedObjects, anchor, error) -> Void in
       self.formatSamples(samples: samples)
     }
     
-    healthStore.start(workoutSession)
-    healthStore.execute(heartRateQuery)
+    if let workoutSession = workoutSession, let heartRateQuery = heartRateQuery {
+      healthStore.start(workoutSession)
+      healthStore.execute(heartRateQuery)
+    }
   }
   
   private func stopWorkoutSession() {
-    healthStore.stop(heartRateQuery)
-    healthStore.end(workoutSession)
+    if let workoutSession = workoutSession, let heartRateQuery = heartRateQuery {
+      healthStore.start(workoutSession)
+      healthStore.execute(heartRateQuery)
+    }
   }
   
   private func formatSamples(samples: [HKSample]?) {
@@ -140,6 +142,13 @@ class InterfaceController: WKInterfaceController {
     wcSession.sendMessage(["startRun": runIsStarted], replyHandler: nil) { (error) in
       print("Error: \(error.localizedDescription)")
     }
+    
+    // This sends message to the iOS app to start a new run,
+    // and the iOS app sends back a message to the watchOS app to
+    // start the workout session. It works okay as it is, but if there
+    // is no connection with the iOS app, the watchOS app will not
+    // start the workout session, which means that the app
+    // can't be used standalone without the iOS counterpart
   }
   
   private func startWorkout(withState workoutIsStarted: Bool) {
@@ -151,31 +160,21 @@ class InterfaceController: WKInterfaceController {
     } else {
       buttonOutlet.setTitle("Start")
       heartRateLabel.setText("HeartRate: 00 BPM")
-      // TODO: send stop message to the iOS app !!!!!!!!!!
+      
       stopWorkoutSession()
     }
   }
   
-  // MARK: - IBAciton
+  // MARK: - IBAction
   @IBAction func startButton() {
     startButtonIsPressed = !startButtonIsPressed
     startNewRun(withState: startButtonIsPressed)
-//    startWorkout(withState: startButtonIsPressed)
   }
 
 }
 
-// MARK: - WCSessionDelegate
-extension InterfaceController: WCSessionDelegate {
-  func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
-    print("Session activation completed with state: \(activationState.rawValue)")
-  }
-  
-  func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
-    if let workoutSessionWasStarted = message["startWorkoutSession"] as? Bool {
-      startButtonIsPressed = workoutSessionWasStarted
-      startWorkout(withState: workoutSessionWasStarted)
-    }
-    
+extension InterfaceController: WorkoutSessionDelegate {
+  func pass(workoutSession session: HKWorkoutSession) {
+    workoutSession = session
   }
 }

@@ -35,9 +35,10 @@ import WatchConnectivity
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
   
+  // MARK: - Vars
   var window: UIWindow?
   let healthStore = HKHealthStore()
-  let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)! // REMOVE force-unwrap
+  let wcSession = WCSession.isSupported() ? WCSession.default : nil
   
   // MARK: - Lifecycle
   func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
@@ -47,6 +48,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     let locationManager = LocationManager.shared
     locationManager.requestWhenInUseAuthorization()
     
+    setupWatchConnectivitySession()
     authorizeHealthKit { (authorized,  error) -> Void in
       if authorized {
         print("HealthKit authorization received.")
@@ -71,6 +73,10 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
   }
   
   // MARK: - Private
+  private func setupWatchConnectivitySession() {
+    wcSession?.delegate = self
+    wcSession?.activate()
+  }
   
   private func authorizeHealthKit(completion: @escaping (_ success: Bool, _ error: NSError?) -> Void) {
     guard HKHealthStore.isHealthDataAvailable() else {
@@ -80,31 +86,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       return
     }
     
-    // probably should if let them all ?!?
-    let typesToShare: Set = [
-      HKQuantityType.quantityType(forIdentifier: .bodyMassIndex)!,
-      HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
-      HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning)!,
-      HKQuantityType.workoutType()
-    ]
+    guard let bodyMassIndex = HKQuantityType.quantityType(forIdentifier: .bodyMassIndex),
+      let activeEnergyBurned = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned),
+      let distanceWalkingRunning = HKQuantityType.quantityType(forIdentifier: .distanceWalkingRunning), // typesToShare
+      let dateOfBirth = HKQuantityType.characteristicType(forIdentifier: .dateOfBirth),
+      let bloodType = HKQuantityType.characteristicType(forIdentifier: .bloodType),
+      let biologicalSex = HKQuantityType.characteristicType(forIdentifier: .biologicalSex),
+      let bodyMass = HKQuantityType.quantityType(forIdentifier: .bodyMass),
+      let height = HKQuantityType.quantityType(forIdentifier: .height),
+      let heartRate = HKQuantityType.quantityType(forIdentifier: .heartRate) else { // typesToRead
+        return
+    }
     
-    let typesToRead: Set = [
-      HKQuantityType.characteristicType(forIdentifier: .dateOfBirth)!,
-      HKQuantityType.characteristicType(forIdentifier: .bloodType)!,
-      HKQuantityType.characteristicType(forIdentifier: .biologicalSex)!,
-      HKQuantityType.quantityType(forIdentifier: .bodyMass)!,
-      HKQuantityType.quantityType(forIdentifier: .height)!,
-      HKQuantityType.quantityType(forIdentifier: .heartRate)!,
-      HKQuantityType.workoutType()
-    ]
+    let typesToShare: Set = [ bodyMassIndex, activeEnergyBurned, distanceWalkingRunning, HKQuantityType.workoutType() ]
+    let typesToRead: Set = [ dateOfBirth, bloodType, biologicalSex, bodyMass, height, heartRate, HKQuantityType.workoutType() ]
     
     healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { (success, error) in
       DispatchQueue.main.async {
-        self.enableBackgroundDelivery(for: self.heartRateType)
+        self.enableBackgroundDelivery(for: heartRate)
       }
         
       completion(success, nil)
     }
+    
   }
   
   private func enableBackgroundDelivery(for type: HKQuantityType) {
@@ -120,8 +124,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
   }
   
-  private func setupWatchConnectivitySession() {
-    
+}
+
+// MARK: - Watch Conectivity Session Delegate
+extension AppDelegate: WCSessionDelegate {
+  func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+    print("Watch session activation completed with state: \(activationState.rawValue)")
+  }
+  
+  func sessionDidBecomeInactive(_ session: WCSession) {
+    print("Watch session became inactive")
+  }
+  
+  func sessionDidDeactivate(_ session: WCSession) {
+    print("Watch session became deactivated")
+  }
+  
+  func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
+    NotificationCenter.default.post(name: NSNotification.Name(rawValue: "watchMessageReceived"), object: self, userInfo: message)
   }
   
 }
