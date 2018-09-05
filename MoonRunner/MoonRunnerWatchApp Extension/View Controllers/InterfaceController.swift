@@ -40,6 +40,7 @@ class InterfaceController: WKInterfaceController {
   private let healthStore = HKHealthStore()
   private let wcSession = WCSession.default
   private var workoutSession: HKWorkoutSession?
+  private var workoutConfiguration: HKWorkoutConfiguration?
   private var heartRateQuery: HKAnchoredObjectQuery?
   
   private var startButtonIsPressed = false
@@ -54,14 +55,6 @@ class InterfaceController: WKInterfaceController {
   override func didAppear() {
     super.didAppear()
   
-//    if let extensionDelegate = WKExtension.shared().delegate as? ExtensionDelegate {
-//      if extensionDelegate.workoutSession != nil {
-//        workoutSession = extensionDelegate.workoutSession
-//      } else {
-//        setupWorkoutSession(activityType: .running, locationType: .unknown)
-//      }
-//    }
-    
     if let extensionDelegate = WKExtension.shared().delegate as? ExtensionDelegate {
       extensionDelegate.delegate = self
     }
@@ -83,32 +76,29 @@ class InterfaceController: WKInterfaceController {
     
   }
   
-//  private func setupWorkoutSession(activityType activity: HKWorkoutActivityType, locationType location: HKWorkoutSessionLocationType) {
-//    let workoutConfiguration = HKWorkoutConfiguration()
-//
-//    workoutConfiguration.activityType = activity
-//    workoutConfiguration.locationType = location
-//
-//    do {
-//      workoutSession = try HKWorkoutSession(configuration: workoutConfiguration)
-//    } catch {
-//      print("Error: \(error.localizedDescription)")
-//    }
-//  }
-  
   private func startWorkoutSession() {
-    let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
-    let predicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options: [])
+    guard let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate),
+      let workoutConfiguration = workoutConfiguration else {
+      return
+    }
     
+    do {
+      workoutSession = try HKWorkoutSession(configuration: workoutConfiguration)
+    } catch {
+      print("Error: \(error.localizedDescription)")
+    }
+    
+    let predicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options: [])
     heartRateQuery = HKAnchoredObjectQuery(type: heartRateType, predicate: predicate, anchor: nil, limit: Int(HKObjectQueryNoLimit)) { (query, samples, deletedObjects, anchor, error) in
       self.formatSamples(samples: samples)
     }
     
-    heartRateQuery?.updateHandler = { (query, samples, deletedObjects, anchor, error) -> Void in
-      self.formatSamples(samples: samples)
-    }
-    
-    if let workoutSession = workoutSession, let heartRateQuery = heartRateQuery {
+    if let heartRateQuery = heartRateQuery,
+      let workoutSession = workoutSession {
+      heartRateQuery.updateHandler = { (query, samples, deletedObjects, anchor, error) -> Void in
+        self.formatSamples(samples: samples)
+      }
+      
       healthStore.start(workoutSession)
       healthStore.execute(heartRateQuery)
     }
@@ -116,8 +106,8 @@ class InterfaceController: WKInterfaceController {
   
   private func stopWorkoutSession() {
     if let workoutSession = workoutSession, let heartRateQuery = heartRateQuery {
-      healthStore.start(workoutSession)
-      healthStore.execute(heartRateQuery)
+      healthStore.end(workoutSession)
+      healthStore.stop(heartRateQuery)
     }
   }
   
@@ -174,7 +164,7 @@ class InterfaceController: WKInterfaceController {
 }
 
 extension InterfaceController: WorkoutSessionDelegate {
-  func pass(workoutSession session: HKWorkoutSession) {
-    workoutSession = session
+  func pass(workoutConfiguration configuration: HKWorkoutConfiguration) {
+    workoutConfiguration = configuration
   }
 }

@@ -34,7 +34,7 @@ import HealthKit
 import WatchConnectivity
 
 protocol WorkoutSessionDelegate: class {
-  func pass(workoutSession session: HKWorkoutSession)
+  func pass(workoutConfiguration configuration: HKWorkoutConfiguration)
 }
 
 class ExtensionDelegate: NSObject {
@@ -86,13 +86,12 @@ class ExtensionDelegate: NSObject {
   
   // MARK: - Private
   private func healthStoreAuthorization() {
-    let typesToShare: Set = [
-      HKQuantityType.workoutType()
-    ]
+    guard let heartRate = HKQuantityType.quantityType(forIdentifier: .heartRate) else {
+      return
+    }
     
-    let typesToRead: Set = [
-      HKQuantityType.quantityType(forIdentifier: .heartRate)!
-    ]
+    let typesToShare: Set = [ HKQuantityType.workoutType() ]
+    let typesToRead: Set = [ heartRate ]
     
     healthStore.requestAuthorization(toShare: typesToShare, read: typesToRead) { (success, error) in
       if let theError = error {
@@ -108,14 +107,10 @@ class ExtensionDelegate: NSObject {
   
 }
 
+// MARK: - WKExtensionDelegate
 extension ExtensionDelegate: WKExtensionDelegate {
   func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
-    do {
-      let workoutSession = try HKWorkoutSession(configuration: workoutConfiguration)
-      delegate?.pass(workoutSession: workoutSession)
-    } catch {
-      print("Error: \(error.localizedDescription)")
-    }
+    delegate?.pass(workoutConfiguration: workoutConfiguration)
   }
 }
 
@@ -130,7 +125,7 @@ extension ExtensionDelegate: WCSessionDelegate {
     case .activated: stateToPrint = ".activated"
     }
     
-    print("Session activation completed with state: \(stateToPrint)")
+    print("Watch Connectivity session activation completed with state: \(stateToPrint)")
   }
   
   func session(_ session: WCSession, didReceiveMessage message: [String : Any]) {
