@@ -194,6 +194,9 @@ class NewRunViewController: UIViewController {
   private func eachSecond() {
     seconds += 1
     checkNextBadge()
+    updateWatchDisplay(distance: FormatDisplay.distance(distance), time: FormatDisplay.time(seconds), pace: FormatDisplay.pace(distance: distance,
+                                                                                                                               seconds: seconds,
+                                                                                                                               outputUnit: UnitSpeed.minutesPerKilometer))
     updateDisplay()
   }
   
@@ -208,6 +211,8 @@ class NewRunViewController: UIViewController {
     timeLabel.text = "Time:  \(formattedTime)"
     paceLabel.text = "Pace:  \(formattedPace)"
     
+//    updateWatchDisplay(distance: formattedDistance, time: formattedTime, pace: formattedPace)
+    
     if let heartRate = heartRateList.last {
       self.heartRateLabel.text = "HeartRate: \(heartRate) BPM"
     }
@@ -215,6 +220,13 @@ class NewRunViewController: UIViewController {
     let distanceRemaining = upcomingBadge.distance - distance.value
     let formattedDistanceRemaining = FormatDisplay.distance(distanceRemaining)
     badgeInfoLabel.text = "\(formattedDistanceRemaining) until \(upcomingBadge.name)"
+  }
+  
+  private func updateWatchDisplay(distance formattedDistance: String, time formattedTime: String, pace formattedPace: String) {
+    let updatedDisplayData = [ "distance" : formattedDistance, "time" : formattedTime, "pace" : formattedPace ]
+    wcSession.sendMessage(updatedDisplayData, replyHandler: nil) { (error) in
+      print("Error: \(error.localizedDescription)")
+    }
   }
   
   private func startLocationUpdates() {

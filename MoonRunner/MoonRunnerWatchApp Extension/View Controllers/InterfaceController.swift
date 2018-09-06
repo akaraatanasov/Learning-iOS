@@ -48,6 +48,9 @@ class InterfaceController: WKInterfaceController {
   var delegate: WorkoutSessionDelegate?
   
   // MARK: - IBOutlet
+  @IBOutlet var distanceLabel: WKInterfaceLabel!
+  @IBOutlet var timeLabel: WKInterfaceLabel!
+  @IBOutlet var paceLabel: WKInterfaceLabel!
   @IBOutlet var heartRateLabel: WKInterfaceLabel!
   @IBOutlet var buttonOutlet: WKInterfaceButton!
   
@@ -72,6 +75,11 @@ class InterfaceController: WKInterfaceController {
     if let workoutSessionWasStarted = message["startWorkoutSession"] as? Bool {
       startButtonIsPressed = workoutSessionWasStarted
       startWorkout(withState: workoutSessionWasStarted)
+    }
+    
+    // Update display data
+    if let updatedDisplayData = message as? [String : String] {
+      updateDisplay(with: updatedDisplayData)
     }
     
   }
@@ -118,7 +126,9 @@ class InterfaceController: WKInterfaceController {
     let heartRate = HKUnit(from: "count/min")
     let heartRateValue = Int(quantity.doubleValue(for: heartRate))
     print("HeartRate (watchOS): \(heartRateValue) BPM")
-    heartRateLabel.setText("HeartRate: \(heartRateValue) BPM")
+    DispatchQueue.main.async {
+      self.heartRateLabel.setText("HeartRate: \(heartRateValue) BPM")
+    }
     sendHeartRate(with: heartRateValue)
   }
   
@@ -134,7 +144,8 @@ class InterfaceController: WKInterfaceController {
     }
     
     // This sends message to the iOS app to start a new run,
-    // and the iOS app sends back a message to the watchOS app to
+    // and when the run is started on the iOS app
+    // it sends back a message to the watchOS app to
     // start the workout session. It works okay as it is, but if there
     // is no connection with the iOS app, the watchOS app will not
     // start the workout session, which means that the app
@@ -143,15 +154,39 @@ class InterfaceController: WKInterfaceController {
   
   private func startWorkout(withState workoutIsStarted: Bool) {
     if workoutIsStarted {
-      buttonOutlet.setTitle("Stop")
-      heartRateLabel.setText("HeartRate: -- BPM")
+      DispatchQueue.main.async {
+        self.distanceLabel.setText("Distance: -- km")
+        self.timeLabel.setText("Time: 0:00:00")
+        self.paceLabel.setText("Pace: -- min/km")
+        self.heartRateLabel.setText("HeartRate: -- BPM")
+        self.buttonOutlet.setTitle("Stop")
+      }
       
       startWorkoutSession()
     } else {
-      buttonOutlet.setTitle("Start")
-      heartRateLabel.setText("HeartRate: 00 BPM")
+      DispatchQueue.main.async {
+        self.distanceLabel.setText("Distance: 0 km")
+        self.timeLabel.setText("Time: 0:00:00")
+        self.paceLabel.setText("Pace: 0 min/km")
+        self.heartRateLabel.setText("HeartRate: 00 BPM")
+        self.buttonOutlet.setTitle("Start")
+      }
       
       stopWorkoutSession()
+    }
+  }
+  
+  private func updateDisplay(with displayData: [String : String]) {
+    guard let distance = displayData["distance"],
+      let time = displayData["time"],
+      let pace = displayData["pace"] else {
+        return
+    }
+    
+    DispatchQueue.main.async {
+      self.distanceLabel.setText("Distance: \(distance)")
+      self.timeLabel.setText("Time: \(time)")
+      self.paceLabel.setText("Pace: \(pace)")
     }
   }
   
@@ -163,6 +198,7 @@ class InterfaceController: WKInterfaceController {
 
 }
 
+// MARK: - Workout Session Delegate
 extension InterfaceController: WorkoutSessionDelegate {
   func pass(workoutConfiguration configuration: HKWorkoutConfiguration) {
     workoutConfiguration = configuration

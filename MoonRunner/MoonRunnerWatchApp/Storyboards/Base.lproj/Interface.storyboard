@@ -14,12 +14,29 @@
             <objects>
                 <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="MoonRunnerWatchApp" customModuleProvider="target">
                     <items>
-                        <group width="1" height="129" alignment="left" spacing="10" id="BUB-bc-ORF">
+                        <group width="1" height="21" alignment="left" id="910-Gh-Tm7">
                             <items>
-                                <label width="136" height="53" alignment="left" text="HeartRate: 00 BPM" textAlignment="left" id="Ysx-H3-Wnd"/>
+                                <label width="136" height="51" alignment="left" text="Distance: 0 km" id="q7p-bN-Gnf"/>
                             </items>
                         </group>
-                        <button width="1" alignment="left" title="Start" id="BVu-WT-LgV">
+                        <group width="1" height="24" alignment="left" id="d0p-dc-NPE">
+                            <items>
+                                <label width="136" height="65" alignment="left" text="Time: 0:00:00" id="xwx-pB-kWk"/>
+                            </items>
+                        </group>
+                        <group width="1" height="22" alignment="left" id="8S4-i9-JZi">
+                            <items>
+                                <label width="136" height="64" alignment="left" text="Pace: 0 min/km" id="7Lg-KP-Ndw"/>
+                            </items>
+                        </group>
+                        <group width="1" height="29" alignment="left" spacing="10" id="BUB-bc-ORF">
+                            <items>
+                                <label height="21" alignment="left" text="HeartRate: 00 BPM" textAlignment="left" id="Ysx-H3-Wnd">
+                                    <fontDescription key="font" type="system" pointSize="16"/>
+                                </label>
+                            </items>
+                        </group>
+                        <button width="1" height="38" alignment="left" title="Start" id="BVu-WT-LgV">
                             <connections>
                                 <action selector="startButton" destination="AgC-eL-Hgc" id="WX2-cI-yje"/>
                             </connections>
@@ -27,11 +44,14 @@
                     </items>
                     <connections>
                         <outlet property="buttonOutlet" destination="BVu-WT-LgV" id="Fnx-XZ-1b5"/>
+                        <outlet property="distanceLabel" destination="q7p-bN-Gnf" id="EBg-bP-9gf"/>
                         <outlet property="heartRateLabel" destination="Ysx-H3-Wnd" id="oJY-Ov-azR"/>
+                        <outlet property="paceLabel" destination="7Lg-KP-Ndw" id="BXZ-hM-p7k"/>
+                        <outlet property="timeLabel" destination="xwx-pB-kWk" id="mA7-Dw-EuW"/>
                     </connections>
                 </controller>
             </objects>
-            <point key="canvasLocation" x="219.69230769230771" y="344.79487179487182"/>
+            <point key="canvasLocation" x="218" y="306"/>
         </scene>
     </scenes>
 </document>
