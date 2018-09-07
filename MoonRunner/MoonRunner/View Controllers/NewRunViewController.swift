@@ -194,9 +194,9 @@ class NewRunViewController: UIViewController {
   private func eachSecond() {
     seconds += 1
     checkNextBadge()
-//    updateWatchDisplay(distance: FormatDisplay.distance(distance), time: FormatDisplay.time(seconds), pace: FormatDisplay.pace(distance: distance,
-//                                                                                                                               seconds: seconds,
-//                                                                                                                               outputUnit: UnitSpeed.minutesPerKilometer))
+    updateWatchDisplay(distance: FormatDisplay.distance(distance), time: FormatDisplay.time(seconds), pace: FormatDisplay.pace(distance: distance,
+                                                                                                                               seconds: seconds,
+                                                                                                                               outputUnit: UnitSpeed.minutesPerKilometer))
     updateDisplay()
   }
   
