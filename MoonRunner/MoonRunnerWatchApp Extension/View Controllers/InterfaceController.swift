@@ -101,15 +101,17 @@ class InterfaceController: WKInterfaceController {
       self.formatSamples(samples: samples)
     }
     
-    if let heartRateQuery = heartRateQuery,
-      let workoutSession = workoutSession {
-      heartRateQuery.updateHandler = { (query, samples, deletedObjects, anchor, error) -> Void in
-        self.formatSamples(samples: samples)
-      }
-      
-      healthStore.start(workoutSession)
-      healthStore.execute(heartRateQuery)
+    heartRateQuery?.updateHandler = { (query, samples, deletedObjects, anchor, error) -> Void in
+      self.formatSamples(samples: samples)
     }
+    
+    guard let heartRateQuery = heartRateQuery,
+      let workoutSession = workoutSession else {
+        return
+    }
+    
+    healthStore.start(workoutSession)
+    healthStore.execute(heartRateQuery)
   }
   
   private func stopWorkoutSession() {

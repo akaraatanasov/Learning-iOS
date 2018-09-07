@@ -188,15 +188,15 @@ class NewRunViewController: UIViewController {
     badgeStackView.isHidden = true
     
     locationManager.stopUpdatingLocation()
-    manageWatchWorkoutSession(startWorkout: false)
+//    manageWatchWorkoutSession(startWorkout: false)
   }
   
   private func eachSecond() {
     seconds += 1
     checkNextBadge()
-    updateWatchDisplay(distance: FormatDisplay.distance(distance), time: FormatDisplay.time(seconds), pace: FormatDisplay.pace(distance: distance,
-                                                                                                                               seconds: seconds,
-                                                                                                                               outputUnit: UnitSpeed.minutesPerKilometer))
+//    updateWatchDisplay(distance: FormatDisplay.distance(distance), time: FormatDisplay.time(seconds), pace: FormatDisplay.pace(distance: distance,
+//                                                                                                                               seconds: seconds,
+//                                                                                                                               outputUnit: UnitSpeed.minutesPerKilometer))
     updateDisplay()
   }
   
@@ -210,9 +210,7 @@ class NewRunViewController: UIViewController {
     distanceLabel.text = "Distance:  \(formattedDistance)"
     timeLabel.text = "Time:  \(formattedTime)"
     paceLabel.text = "Pace:  \(formattedPace)"
-    
-//    updateWatchDisplay(distance: formattedDistance, time: formattedTime, pace: formattedPace)
-    
+
     if let heartRate = heartRateList.last {
       self.heartRateLabel.text = "HeartRate: \(heartRate) BPM"
     }
