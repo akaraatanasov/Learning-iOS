@@ -62,7 +62,10 @@ class InterfaceController: WKInterfaceController {
       extensionDelegate.delegate = self
     }
     
-    NotificationCenter.default.addObserver(self, selector: #selector(phoneMessageReceived), name: NSNotification.Name(rawValue: "phoneMessageReceived"), object: nil)
+    NotificationCenter.default.addObserver(self,
+                                           selector: #selector(phoneMessageReceived),
+                                           name: NSNotification.Name(rawValue: "phoneMessageReceived"),
+                                           object: nil)
   }
   
   // MARK: - Private
@@ -97,7 +100,10 @@ class InterfaceController: WKInterfaceController {
     }
     
     let predicate = HKQuery.predicateForSamples(withStart: Date(), end: nil, options: [])
-    heartRateQuery = HKAnchoredObjectQuery(type: heartRateType, predicate: predicate, anchor: nil, limit: Int(HKObjectQueryNoLimit)) { (query, samples, deletedObjects, anchor, error) in
+    heartRateQuery = HKAnchoredObjectQuery(type: heartRateType,
+                                           predicate: predicate,
+                                           anchor: nil,
+                                           limit: Int(HKObjectQueryNoLimit)) { (_, samples, _, _, _) in
       self.formatSamples(samples: samples)
     }
     
@@ -119,6 +125,8 @@ class InterfaceController: WKInterfaceController {
       healthStore.end(workoutSession)
       healthStore.stop(heartRateQuery)
     }
+    
+    workoutSession = nil
   }
   
   private func formatSamples(samples: [HKSample]?) {
