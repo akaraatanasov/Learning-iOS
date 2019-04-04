@@ -8,7 +8,7 @@
 import UIKit
 import WebKit
 
-class ReadViewController: UIViewController {
+class ReadViewController: UIViewController, LoggerHandling {
 
     // MARK: - Vars
     
@@ -31,7 +31,7 @@ class ReadViewController: UIViewController {
 
         assert(project != nil, "You must set a project before showing this view controller.")
         title = project.title
-        Logger.log("Read project \(project.number).")
+        log("Read project \(project.number).")
 
         guard let url = URL(string: "https://www.hackingwithswift.com/read/\(project.number)/overview") else {
             return

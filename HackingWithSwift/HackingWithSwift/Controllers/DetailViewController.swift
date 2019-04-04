@@ -7,7 +7,7 @@
 
 import UIKit
 
-class DetailViewController: UIViewController {
+class DetailViewController: UIViewController, LoggerHandling {
     
     // MARK: - Vars
     
@@ -32,7 +32,7 @@ class DetailViewController: UIViewController {
 
         navigationItem.largeTitleDisplayMode = .never
         title = "Project \(project.number)"
-        Logger.log("Showed project \(project.number).")
+        log("Showed project \(project.number).")
     }
     
     // MARK: - Private

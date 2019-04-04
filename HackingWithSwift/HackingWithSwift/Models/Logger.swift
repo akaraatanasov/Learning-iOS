@@ -7,6 +7,10 @@
 
 import UIKit
 
+protocol LoggerHandling {
+    func log(_ message: String)
+}
+
 class Logger {
     
     // MARK: - Vars
@@ -26,8 +30,10 @@ class Logger {
     func log(_ message: String) {
         print(message)
     }
+}
 
-    static func log(_ message: String) {
-        shared.log(message)
+extension LoggerHandling {
+    func log(_ message: String) {
+        Logger.shared.log(message)
     }
 }
