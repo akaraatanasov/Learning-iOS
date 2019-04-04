@@ -8,12 +8,19 @@
 import UIKit
 
 struct TechniqueProjectRenderer {
+    
+    // MARK: - Vars
+    
     var project: Project
     var colors = [UIColor(red: 238/255.0, green: 79/255.0, blue: 182/255.0, alpha: 1), UIColor(red: 201/255.0, green: 68/255.0, blue: 255/255.0, alpha: 1)]
 
+    // MARK: - Inits
+    
     init(for project: Project) {
         self.project = project
     }
+    
+    // MARK: - Public
 
     func drawTitleImage() -> UIImage {
         if let cached = imageFromCache() {
@@ -25,6 +32,16 @@ struct TechniqueProjectRenderer {
 
         return image
     }
+    
+    func fileExists(atPath path: String, using: DirectoryManager = FileManager.default) -> Bool {
+        return using.fileExists(atPath: path)
+    }
+    
+    func urls(for directory: FileManager.SearchPathDirectory, in domainMask: FileManager.SearchPathDomainMask, using: DirectoryManager = FileManager.default) -> [URL] {
+        return using.urls(for: directory, in: domainMask)
+    }
+    
+    // MARK: - Private
 
     private func render() -> UIImage {
         let format = UIGraphicsImageRendererFormat()
@@ -56,9 +73,8 @@ struct TechniqueProjectRenderer {
 
     private func imageFromCache() -> UIImage? {
         let url = getCachesDirectory().appendingPathComponent(project.title)
-        let fm = FileManager.default
 
-        if fm.fileExists(atPath: url.path) {
+        if fileExists(atPath: url.path) {
             if let data = try? Data(contentsOf: url) {
                 return UIImage(data: data, scale: UIScreen.main.scale)
             }
@@ -69,11 +85,11 @@ struct TechniqueProjectRenderer {
 
     private func cache(_ image: UIImage) {
         let url = getCachesDirectory().appendingPathComponent(project.title)
-        try? image.pngData()?.write(to: url)
+        ((try? image.pngData()?.write(to: url)) as ()??)
     }
 
     private func getCachesDirectory() -> URL {
-        let paths = FileManager.default.urls(for: .cachesDirectory, in: .userDomainMask)
+        let paths = urls(for: .cachesDirectory, in: .userDomainMask)
         return paths[0]
     }
 }

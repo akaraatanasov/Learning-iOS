@@ -11,6 +11,7 @@
 		11FB74D0222855640038756A /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11FB74CF222855640038756A /* DetailView.swift */; };
 		2027C858224938A7009498CE /* WebViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2027C857224938A7009498CE /* WebViewDelegate.swift */; };
 		2027C85A22493FD6009498CE /* TableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2027C85922493FD6009498CE /* TableViewDataSource.swift */; };
+		20DEFF1C2254DC0100760E16 /* FileManager+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DEFF1B2254DC0100760E16 /* FileManager+Extensions.swift */; };
 		5155740221AEB92500FEE77E /* GameProjectRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155740121AEB92500FEE77E /* GameProjectRenderer.swift */; };
 		5155740421AEBA4900FEE77E /* TechniqueProjectRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155740321AEBA4900FEE77E /* TechniqueProjectRenderer.swift */; };
 		5155740721AED1B000FEE77E /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155740621AED1B000FEE77E /* Logger.swift */; };
@@ -44,6 +45,7 @@
 		11FB74CF222855640038756A /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		2027C857224938A7009498CE /* WebViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewDelegate.swift; sourceTree = "<group>"; };
 		2027C85922493FD6009498CE /* TableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewDataSource.swift; sourceTree = "<group>"; };
+		20DEFF1B2254DC0100760E16 /* FileManager+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+Extensions.swift"; sourceTree = "<group>"; };
 		5155740121AEB92500FEE77E /* GameProjectRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameProjectRenderer.swift; sourceTree = "<group>"; };
 		5155740321AEBA4900FEE77E /* TechniqueProjectRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechniqueProjectRenderer.swift; sourceTree = "<group>"; };
 		5155740621AED1B000FEE77E /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
@@ -142,6 +144,7 @@
 				519BA1E921AE8BEB0078B6F6 /* AppProjectRenderer.swift */,
 				5155740121AEB92500FEE77E /* GameProjectRenderer.swift */,
 				5155740321AEBA4900FEE77E /* TechniqueProjectRenderer.swift */,
+				20DEFF1B2254DC0100760E16 /* FileManager+Extensions.swift */,
 			);
 			path = ProjectRenderers;
 			sourceTree = "<group>";
@@ -236,9 +239,11 @@
 				TargetAttributes = {
 					519AE1482194787D001F5CFF = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1020;
 					};
 					519AE15C2194787E001F5CFF = {
 						CreatedOnToolsVersion = 10.1;
+						LastSwiftMigration = 1020;
 						TestTargetID = 519AE1482194787D001F5CFF;
 					};
 				};
@@ -301,6 +306,7 @@
 				5155740421AEBA4900FEE77E /* TechniqueProjectRenderer.swift in Sources */,
 				5155740221AEB92500FEE77E /* GameProjectRenderer.swift in Sources */,
 				519AE17321948C5A001F5CFF /* ReadViewController.swift in Sources */,
+				20DEFF1C2254DC0100760E16 /* FileManager+Extensions.swift in Sources */,
 				2027C858224938A7009498CE /* WebViewDelegate.swift in Sources */,
 				51D797C021EDBD1A00B31E59 /* User.swift in Sources */,
 			);
@@ -473,7 +479,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mentormate.HackingWithSwift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -491,7 +497,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mentormate.HackingWithSwift;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -511,7 +517,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.hackingwithswift.HackingWithSwiftTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HackingWithSwift.app/HackingWithSwift";
 			};
@@ -532,7 +538,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.hackingwithswift.HackingWithSwiftTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 4.2;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/HackingWithSwift.app/HackingWithSwift";
 			};
