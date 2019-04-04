@@ -12,6 +12,7 @@
 		2027C858224938A7009498CE /* WebViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2027C857224938A7009498CE /* WebViewDelegate.swift */; };
 		2027C85A22493FD6009498CE /* TableViewDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2027C85922493FD6009498CE /* TableViewDataSource.swift */; };
 		20DEFF1C2254DC0100760E16 /* FileManager+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DEFF1B2254DC0100760E16 /* FileManager+Extensions.swift */; };
+		20DEFF1E2255096B00760E16 /* ProjectRendererProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DEFF1D2255096B00760E16 /* ProjectRendererProtocol.swift */; };
 		5155740221AEB92500FEE77E /* GameProjectRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155740121AEB92500FEE77E /* GameProjectRenderer.swift */; };
 		5155740421AEBA4900FEE77E /* TechniqueProjectRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155740321AEBA4900FEE77E /* TechniqueProjectRenderer.swift */; };
 		5155740721AED1B000FEE77E /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155740621AED1B000FEE77E /* Logger.swift */; };
@@ -46,6 +47,7 @@
 		2027C857224938A7009498CE /* WebViewDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewDelegate.swift; sourceTree = "<group>"; };
 		2027C85922493FD6009498CE /* TableViewDataSource.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableViewDataSource.swift; sourceTree = "<group>"; };
 		20DEFF1B2254DC0100760E16 /* FileManager+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FileManager+Extensions.swift"; sourceTree = "<group>"; };
+		20DEFF1D2255096B00760E16 /* ProjectRendererProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectRendererProtocol.swift; sourceTree = "<group>"; };
 		5155740121AEB92500FEE77E /* GameProjectRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameProjectRenderer.swift; sourceTree = "<group>"; };
 		5155740321AEBA4900FEE77E /* TechniqueProjectRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechniqueProjectRenderer.swift; sourceTree = "<group>"; };
 		5155740621AED1B000FEE77E /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 		5155740521AEBECE00FEE77E /* ProjectRenderers */ = {
 			isa = PBXGroup;
 			children = (
+				20DEFF1D2255096B00760E16 /* ProjectRendererProtocol.swift */,
 				519BA1E921AE8BEB0078B6F6 /* AppProjectRenderer.swift */,
 				5155740121AEB92500FEE77E /* GameProjectRenderer.swift */,
 				5155740321AEBA4900FEE77E /* TechniqueProjectRenderer.swift */,
@@ -306,6 +309,7 @@
 				5155740421AEBA4900FEE77E /* TechniqueProjectRenderer.swift in Sources */,
 				5155740221AEB92500FEE77E /* GameProjectRenderer.swift in Sources */,
 				519AE17321948C5A001F5CFF /* ReadViewController.swift in Sources */,
+				20DEFF1E2255096B00760E16 /* ProjectRendererProtocol.swift in Sources */,
 				20DEFF1C2254DC0100760E16 /* FileManager+Extensions.swift in Sources */,
 				2027C858224938A7009498CE /* WebViewDelegate.swift in Sources */,
 				51D797C021EDBD1A00B31E59 /* User.swift in Sources */,
