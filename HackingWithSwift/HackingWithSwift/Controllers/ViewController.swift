@@ -56,13 +56,7 @@ class ViewController: UITableViewController {
     }
     
     @objc private func showSettings() {
-        guard let vc = storyboard?.instantiateViewController(withIdentifier: "SettingsViewController") as? SettingsViewController else {
-            fatalError("Unable to find SettingsViewController")
-        }
-        
-        vc.delegate = self
-        vc.user = user
-        navigationController?.pushViewController(vc, animated: true)
+        coordinator?.showSettingsViewController(with: user, from: self)
     }
     
     // MARK: - Public
@@ -77,13 +71,7 @@ class ViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let project = showingProjects[indexPath.row]
-
-        guard let detailVC = storyboard?.instantiateViewController(withIdentifier: "DetailViewController") as? DetailViewController else {
-            return
-        }
-
-        detailVC.project = project
-        navigationController?.pushViewController(detailVC, animated: true)
+        coordinator?.showDetailViewController(with: project)
     }
     
 }

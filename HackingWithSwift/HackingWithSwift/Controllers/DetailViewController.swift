@@ -13,11 +13,14 @@ class DetailViewController: UIViewController, LoggerHandling {
     
     var project: Project!
     
+    weak var coordinator: MainCoordinator?
+    
     // MARK: - Lifecycle
     
     override func loadView() {
         let detailView = DetailView(with: project) { [weak self] in
-            self?.showReadVC()
+            guard let strongSelf = self else { return }
+            strongSelf.coordinator?.showReadViewController(with: strongSelf.project)
         }
         view = detailView
     }
@@ -35,14 +38,4 @@ class DetailViewController: UIViewController, LoggerHandling {
         log("Showed project \(project.number).")
     }
     
-    // MARK: - Private
-    
-    private func showReadVC() {
-        guard let readVC = storyboard?.instantiateViewController(withIdentifier: "ReadViewController") as? ReadViewController else {
-            return
-        }
-        
-        readVC.project = project
-        navigationController?.pushViewController(readVC, animated: true)
-    }
 }
