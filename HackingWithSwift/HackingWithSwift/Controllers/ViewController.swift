@@ -34,21 +34,7 @@ class ViewController: UITableViewController {
     }
     
     private func loadProjects() {
-        guard let url = Bundle.main.url(forResource: "projects", withExtension: "json") else {
-            fatalError("Failed to locate projects.json in app bundle.")
-        }
-        
-        guard let data = try? Data(contentsOf: url) else {
-            fatalError("Failed to load projects.json in app bundle.")
-        }
-        
-        let decoder = JSONDecoder()
-        
-        guard let loadedProjects = try? decoder.decode([Project].self, from: data) else {
-            fatalError("Failed to decode projects.json from app bundle.")
-        }
-        
-        allProjects = loadedProjects
+        allProjects = Bundle.main.decode([Project].self, from: "projects")
     }
     
     private func updatePreferences() {
@@ -98,4 +84,24 @@ class ViewController: UITableViewController {
         navigationController?.pushViewController(detailVC, animated: true)
     }
     
+}
+
+// MARK: - Bundle Decoder Extension
+
+extension Bundle {
+    func decode<T: Decodable>(_ type: T.Type, from file: String) -> T {
+        guard let url = Bundle.main.url(forResource: file, withExtension: "json") else {
+            fatalError("Failed to locate \(file).json in app bundle.")
+        }
+        
+        guard let data = try? Data(contentsOf: url) else {
+            fatalError("Failed to load \(file).json in app bundle.")
+        }
+
+        guard let loadedProjects = try? JSONDecoder().decode(T.self, from: data) else {
+            fatalError("Failed to decode projects.json from app bundle.")
+        }
+        
+        return loadedProjects
+    }
 }
