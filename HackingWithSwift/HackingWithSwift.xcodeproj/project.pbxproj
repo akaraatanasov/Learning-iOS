@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		11FB74CE222851070038756A /* CustomLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11FB74CD222851070038756A /* CustomLabel.swift */; };
+		11FB74D0222855640038756A /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 11FB74CF222855640038756A /* DetailView.swift */; };
 		5155740221AEB92500FEE77E /* GameProjectRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155740121AEB92500FEE77E /* GameProjectRenderer.swift */; };
 		5155740421AEBA4900FEE77E /* TechniqueProjectRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155740321AEBA4900FEE77E /* TechniqueProjectRenderer.swift */; };
 		5155740721AED1B000FEE77E /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155740621AED1B000FEE77E /* Logger.swift */; };
@@ -36,6 +38,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		11FB74CD222851070038756A /* CustomLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomLabel.swift; sourceTree = "<group>"; };
+		11FB74CF222855640038756A /* DetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
 		5155740121AEB92500FEE77E /* GameProjectRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameProjectRenderer.swift; sourceTree = "<group>"; };
 		5155740321AEBA4900FEE77E /* TechniqueProjectRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechniqueProjectRenderer.swift; sourceTree = "<group>"; };
 		5155740621AED1B000FEE77E /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
@@ -76,6 +80,37 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		11FB74CA22284D880038756A /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				519AE14C2194787D001F5CFF /* AppDelegate.swift */,
+				519AE1502194787D001F5CFF /* Main.storyboard */,
+				519AE1552194787E001F5CFF /* LaunchScreen.storyboard */,
+				519AE1532194787E001F5CFF /* Assets.xcassets */,
+				519AE1582194787E001F5CFF /* Info.plist */,
+			);
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		11FB74CB22284EC20038756A /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				519AE16E219479E3001F5CFF /* Project.swift */,
+				5155740621AED1B000FEE77E /* Logger.swift */,
+				51D797BF21EDBD1A00B31E59 /* User.swift */,
+			);
+			name = Models;
+			sourceTree = "<group>";
+		};
+		11FB74CC22284ED20038756A /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				11FB74CD222851070038756A /* CustomLabel.swift */,
+				11FB74CF222855640038756A /* DetailView.swift */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
 		5155740521AEBECE00FEE77E /* ProjectRenderers */ = {
 			isa = PBXGroup;
 			children = (
@@ -107,20 +142,15 @@
 		519AE14B2194787D001F5CFF /* HackingWithSwift */ = {
 			isa = PBXGroup;
 			children = (
+				11FB74CB22284EC20038756A /* Models */,
+				11FB74CC22284ED20038756A /* Views */,
 				5155740521AEBECE00FEE77E /* ProjectRenderers */,
-				519AE14C2194787D001F5CFF /* AppDelegate.swift */,
 				519AE14E2194787D001F5CFF /* ViewController.swift */,
 				519AE16C21947911001F5CFF /* DetailViewController.swift */,
 				519AE17221948C5A001F5CFF /* ReadViewController.swift */,
 				51D797BD21EDB37B00B31E59 /* SettingsViewController.swift */,
-				519AE16E219479E3001F5CFF /* Project.swift */,
-				5155740621AED1B000FEE77E /* Logger.swift */,
-				51D797BF21EDBD1A00B31E59 /* User.swift */,
 				519AE17021947AB5001F5CFF /* projects.json */,
-				519AE1502194787D001F5CFF /* Main.storyboard */,
-				519AE1552194787E001F5CFF /* LaunchScreen.storyboard */,
-				519AE1532194787E001F5CFF /* Assets.xcassets */,
-				519AE1582194787E001F5CFF /* Info.plist */,
+				11FB74CA22284D880038756A /* Supporting Files */,
 			);
 			path = HackingWithSwift;
 			sourceTree = "<group>";
@@ -243,6 +273,8 @@
 				519AE16F219479E3001F5CFF /* Project.swift in Sources */,
 				5155740721AED1B000FEE77E /* Logger.swift in Sources */,
 				519BA1EA21AE8BEB0078B6F6 /* AppProjectRenderer.swift in Sources */,
+				11FB74D0222855640038756A /* DetailView.swift in Sources */,
+				11FB74CE222851070038756A /* CustomLabel.swift in Sources */,
 				5155740421AEBA4900FEE77E /* TechniqueProjectRenderer.swift in Sources */,
 				5155740221AEB92500FEE77E /* GameProjectRenderer.swift in Sources */,
 				519AE17321948C5A001F5CFF /* ReadViewController.swift in Sources */,
@@ -410,7 +442,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = X4FQH6N5F7;
-				INFOPLIST_FILE = HackingWithSwift/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/HackingWithSwift/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -428,7 +460,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = X4FQH6N5F7;
-				INFOPLIST_FILE = HackingWithSwift/Info.plist;
+				INFOPLIST_FILE = "$(SRCROOT)/HackingWithSwift/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

@@ -79,7 +79,7 @@ class ViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         let project = showingProjects[indexPath.row]
-        cell.textLabel?.attributedText = makeAttributedString(title: project.title, subtitle: project.subtitle)
+        cell.textLabel?.attributedText = project.attributedText
         return cell
     }
 
@@ -94,15 +94,5 @@ class ViewController: UITableViewController {
         navigationController?.pushViewController(detailVC, animated: true)
     }
 
-    func makeAttributedString(title: String, subtitle: String) -> NSAttributedString {
-        let titleAttributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .headline), NSAttributedString.Key.foregroundColor: UIColor.purple]
-        let subtitleAttributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .subheadline)]
-
-        let titleString = NSMutableAttributedString(string: "\(title)\n", attributes: titleAttributes)
-        let subtitleString = NSAttributedString(string: subtitle, attributes: subtitleAttributes)
-
-        titleString.append(subtitleString)
-
-        return titleString
-    }
+    
 }
