@@ -8,9 +8,9 @@
 
 import Foundation
 
-protocol DirectoryManager {
+protocol DirectoryManagerDelegate {
     func fileExists(atPath path: String) -> Bool
     func urls(for directory: FileManager.SearchPathDirectory, in domainMask: FileManager.SearchPathDomainMask) -> [URL]
 }
 
-extension FileManager: DirectoryManager { }
+extension FileManager: DirectoryManagerDelegate { }

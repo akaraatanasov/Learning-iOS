@@ -7,8 +7,8 @@
 
 import UIKit
 
-struct AppProjectRenderer: ProjectRenderer {
-    
+struct AppProjectRenderer: ProjectRendererDelegate {
+
     // MARK: - Vars
     
     var project: Project

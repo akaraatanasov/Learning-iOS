@@ -7,7 +7,7 @@
 
 import UIKit
 
-struct GameProjectRenderer: ProjectRenderer {
+struct GameProjectRenderer: ProjectRendererDelegate {
     
     // MARK: - Vars
     

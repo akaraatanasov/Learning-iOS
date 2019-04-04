@@ -7,7 +7,7 @@
 
 import UIKit
 
-struct TechniqueProjectRenderer: ProjectRenderer {
+struct TechniqueProjectRenderer: ProjectRendererDelegate {
     
     // MARK: - Vars
     

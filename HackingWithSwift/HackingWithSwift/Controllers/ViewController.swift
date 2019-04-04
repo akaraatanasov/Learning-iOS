@@ -16,6 +16,8 @@ class ViewController: UITableViewController {
     var showingProjects = [Project]()
     var dataSource = TableViewDataSource()
     
+    weak var coordinator: MainCoordinator?
+    
     // MARK: - Lifecycle
     
     override func viewDidLoad() {

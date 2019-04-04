@@ -12,27 +12,16 @@ enum Renderer {
     case app, game, technique
 }
 
-protocol ProjectRenderer {
+protocol ProjectRendererDelegate {
     var project: Project { get set }
     var colors: [UIColor] { get set }
     
-    func fileExists(atPath path: String, using: DirectoryManager) -> Bool
-    func urls(for directory: FileManager.SearchPathDirectory, in domainMask: FileManager.SearchPathDomainMask, using: DirectoryManager) -> [URL]
     func drawTitleImage(for type: Renderer) -> UIImage
-    func render(for type: Renderer) -> UIImage
-    func imageFromCache() -> UIImage?
-    func cache(_ image: UIImage)
-    func getCachesDirectory() -> URL
 }
 
-extension ProjectRenderer {
-    func fileExists(atPath path: String, using: DirectoryManager = FileManager.default) -> Bool {
-        return using.fileExists(atPath: path)
-    }
+extension ProjectRendererDelegate {
     
-    func urls(for directory: FileManager.SearchPathDirectory, in domainMask: FileManager.SearchPathDomainMask, using: DirectoryManager = FileManager.default) -> [URL] {
-        return using.urls(for: directory, in: domainMask)
-    }
+    // MARK: - Public
     
     func drawTitleImage(for type: Renderer) -> UIImage {
         if let cached = imageFromCache() {
@@ -45,7 +34,17 @@ extension ProjectRenderer {
         return image
     }
     
-    func render(for type: Renderer) -> UIImage {
+    // MARK: - Private
+    
+    private func fileExists(atPath path: String, using: DirectoryManagerDelegate = FileManager.default) -> Bool {
+        return using.fileExists(atPath: path)
+    }
+    
+    private func urls(for directory: FileManager.SearchPathDirectory, in domainMask: FileManager.SearchPathDomainMask, using: DirectoryManagerDelegate = FileManager.default) -> [URL] {
+        return using.urls(for: directory, in: domainMask)
+    }
+    
+    private func render(for type: Renderer) -> UIImage {
         let format = UIGraphicsImageRendererFormat()
         format.scale = UIScreen.main.scale
         format.opaque = true
@@ -88,7 +87,7 @@ extension ProjectRenderer {
         }
     }
     
-    func imageFromCache() -> UIImage? {
+    private func imageFromCache() -> UIImage? {
         let url = getCachesDirectory().appendingPathComponent(project.title)
         
         if fileExists(atPath: url.path) {
@@ -100,12 +99,12 @@ extension ProjectRenderer {
         return nil
     }
     
-    func cache(_ image: UIImage) {
+    private func cache(_ image: UIImage) {
         let url = getCachesDirectory().appendingPathComponent(project.title)
         ((try? image.pngData()?.write(to: url)) as ()??)
     }
     
-    func getCachesDirectory() -> URL {
+    private func getCachesDirectory() -> URL {
         let paths = urls(for: .cachesDirectory, in: .userDomainMask)
         return paths[0]
     }
