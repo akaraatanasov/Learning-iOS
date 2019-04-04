@@ -14,6 +14,10 @@
 		20DEFF1C2254DC0100760E16 /* DirectoryManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DEFF1B2254DC0100760E16 /* DirectoryManagerDelegate.swift */; };
 		20DEFF1E2255096B00760E16 /* ProjectRendererDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DEFF1D2255096B00760E16 /* ProjectRendererDelegate.swift */; };
 		20DEFF2022560A2700760E16 /* MainCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DEFF1F22560A2700760E16 /* MainCoordinator.swift */; };
+		20DEFF2622563BCA00760E16 /* NameObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DEFF2522563BCA00760E16 /* NameObservable.swift */; };
+		20DEFF2822563D6F00760E16 /* BoundTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DEFF2722563D6F00760E16 /* BoundTextField.swift */; };
+		20DEFF2A2256549700760E16 /* ProjectsObservable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DEFF292256549700760E16 /* ProjectsObservable.swift */; };
+		20DEFF2C2256563000760E16 /* BoundSegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20DEFF2B2256563000760E16 /* BoundSegmentedControl.swift */; };
 		5155740221AEB92500FEE77E /* GameProjectRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155740121AEB92500FEE77E /* GameProjectRenderer.swift */; };
 		5155740421AEBA4900FEE77E /* TechniqueProjectRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155740321AEBA4900FEE77E /* TechniqueProjectRenderer.swift */; };
 		5155740721AED1B000FEE77E /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5155740621AED1B000FEE77E /* Logger.swift */; };
@@ -50,6 +54,10 @@
 		20DEFF1B2254DC0100760E16 /* DirectoryManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DirectoryManagerDelegate.swift; sourceTree = "<group>"; };
 		20DEFF1D2255096B00760E16 /* ProjectRendererDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectRendererDelegate.swift; sourceTree = "<group>"; };
 		20DEFF1F22560A2700760E16 /* MainCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCoordinator.swift; sourceTree = "<group>"; };
+		20DEFF2522563BCA00760E16 /* NameObservable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NameObservable.swift; sourceTree = "<group>"; };
+		20DEFF2722563D6F00760E16 /* BoundTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundTextField.swift; sourceTree = "<group>"; };
+		20DEFF292256549700760E16 /* ProjectsObservable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectsObservable.swift; sourceTree = "<group>"; };
+		20DEFF2B2256563000760E16 /* BoundSegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoundSegmentedControl.swift; sourceTree = "<group>"; };
 		5155740121AEB92500FEE77E /* GameProjectRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameProjectRenderer.swift; sourceTree = "<group>"; };
 		5155740321AEBA4900FEE77E /* TechniqueProjectRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TechniqueProjectRenderer.swift; sourceTree = "<group>"; };
 		5155740621AED1B000FEE77E /* Logger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
@@ -95,7 +103,6 @@
 			children = (
 				519AE17021947AB5001F5CFF /* projects.json */,
 				519AE14C2194787D001F5CFF /* AppDelegate.swift */,
-				20DEFF1F22560A2700760E16 /* MainCoordinator.swift */,
 				519AE1502194787D001F5CFF /* Main.storyboard */,
 				519AE1552194787E001F5CFF /* LaunchScreen.storyboard */,
 				519AE1532194787E001F5CFF /* Assets.xcassets */,
@@ -130,6 +137,8 @@
 			children = (
 				11FB74CD222851070038756A /* CustomLabel.swift */,
 				11FB74CF222855640038756A /* DetailView.swift */,
+				20DEFF2722563D6F00760E16 /* BoundTextField.swift */,
+				20DEFF2B2256563000760E16 /* BoundSegmentedControl.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -143,6 +152,23 @@
 				20DEFF1D2255096B00760E16 /* ProjectRendererDelegate.swift */,
 			);
 			path = Delegates;
+			sourceTree = "<group>";
+		};
+		20DEFF2322563B3000760E16 /* Coordinators */ = {
+			isa = PBXGroup;
+			children = (
+				20DEFF1F22560A2700760E16 /* MainCoordinator.swift */,
+			);
+			path = Coordinators;
+			sourceTree = "<group>";
+		};
+		20DEFF2422563B7A00760E16 /* Observables */ = {
+			isa = PBXGroup;
+			children = (
+				20DEFF2522563BCA00760E16 /* NameObservable.swift */,
+				20DEFF292256549700760E16 /* ProjectsObservable.swift */,
+			);
+			path = Observables;
 			sourceTree = "<group>";
 		};
 		5155740521AEBECE00FEE77E /* ProjectRenderers */ = {
@@ -177,10 +203,12 @@
 			isa = PBXGroup;
 			children = (
 				5155740521AEBECE00FEE77E /* ProjectRenderers */,
+				20DEFF2422563B7A00760E16 /* Observables */,
 				2027C854224936F7009498CE /* Models */,
 				2027C85522493707009498CE /* Views */,
 				2027C853224936E5009498CE /* Controllers */,
 				2027C856224937FE009498CE /* Delegates */,
+				20DEFF2322563B3000760E16 /* Coordinators */,
 				11FB74CA22284D880038756A /* Supporting Files */,
 			);
 			path = HackingWithSwift;
@@ -303,14 +331,18 @@
 				519AE14F2194787D001F5CFF /* ViewController.swift in Sources */,
 				519AE14D2194787D001F5CFF /* AppDelegate.swift in Sources */,
 				51D797BE21EDB37B00B31E59 /* SettingsViewController.swift in Sources */,
+				20DEFF2622563BCA00760E16 /* NameObservable.swift in Sources */,
 				519AE16F219479E3001F5CFF /* Project.swift in Sources */,
 				5155740721AED1B000FEE77E /* Logger.swift in Sources */,
 				2027C85A22493FD6009498CE /* TableViewDataSource.swift in Sources */,
 				20DEFF2022560A2700760E16 /* MainCoordinator.swift in Sources */,
+				20DEFF2A2256549700760E16 /* ProjectsObservable.swift in Sources */,
 				519BA1EA21AE8BEB0078B6F6 /* AppProjectRenderer.swift in Sources */,
 				11FB74D0222855640038756A /* DetailView.swift in Sources */,
 				11FB74CE222851070038756A /* CustomLabel.swift in Sources */,
+				20DEFF2822563D6F00760E16 /* BoundTextField.swift in Sources */,
 				5155740421AEBA4900FEE77E /* TechniqueProjectRenderer.swift in Sources */,
+				20DEFF2C2256563000760E16 /* BoundSegmentedControl.swift in Sources */,
 				5155740221AEB92500FEE77E /* GameProjectRenderer.swift in Sources */,
 				519AE17321948C5A001F5CFF /* ReadViewController.swift in Sources */,
 				20DEFF1E2255096B00760E16 /* ProjectRendererDelegate.swift in Sources */,
@@ -479,7 +511,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = YMKGM6465R;
+				DEVELOPMENT_TEAM = X4FQH6N5F7;
 				INFOPLIST_FILE = "$(SRCROOT)/HackingWithSwift/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -497,7 +529,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = YMKGM6465R;
+				DEVELOPMENT_TEAM = X4FQH6N5F7;
 				INFOPLIST_FILE = "$(SRCROOT)/HackingWithSwift/Supporting Files/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

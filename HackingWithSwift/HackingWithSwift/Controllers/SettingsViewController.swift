@@ -10,15 +10,13 @@ import UIKit
 class SettingsViewController: UIViewController {
     
     // MARK: - Vars
-    
-    weak var delegate: ViewController?
-    
+
     var user: User!
     
     // MARK: - IBOutlets
     
-    @IBOutlet var name: UITextField!
-    @IBOutlet var projects: UISegmentedControl!
+    @IBOutlet var name: BoundTextField!
+    @IBOutlet var projects: BoundSegmentedControl!
     
     // MARK: - Lifecycle
     
@@ -31,23 +29,22 @@ class SettingsViewController: UIViewController {
         }
 
         title = "Settings"
-        name.text = user.name
-        projects.selectedSegmentIndex = user.showProjects
-    }
-
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-
-        delegate?.updateUser(user)
+        
+        setupBindings()
     }
     
-    // MARK: - IBActions
-
-    @IBAction func nameChanged(_ sender: UITextField) {
-        user?.name = sender.text ?? ""
+    // MARK: - Private
+    
+    private func setupBindings() {
+        name.bind(to: user.name)
+        user.name.valueChanged = { [weak self] _ in
+            self?.user.save()
+        }
+        
+        projects.bind(to: user.showProjects)
+        user.showProjects.valueChanged = { [weak self] _ in
+            self?.user.save()
+        }
     }
-
-    @IBAction func projectsChanged(_ sender: UISegmentedControl) {
-        user?.showProjects = sender.selectedSegmentIndex
-    }
+    
 }

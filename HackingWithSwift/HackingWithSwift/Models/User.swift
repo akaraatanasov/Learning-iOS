@@ -11,20 +11,20 @@ struct User {
     
     // MARK: - Vars
     
-    var name: String
-    var showProjects: Int
+    var name: NameObservable<String>
+    var showProjects: ProjectsObservable<Int>
 
     // MARK: - Inits
     
     init(name: String = UserDefaults.standard.string(forKey: "UserName") ?? "Anonymous", showProjects: Int = UserDefaults.standard.integer(forKey: "UserProjects")) {
-        self.name = name
-        self.showProjects = showProjects
+        self.name = NameObservable(name)
+        self.showProjects = ProjectsObservable(showProjects)
     }
     
     // MARK: - Public
 
     func save() {
-        UserDefaults.standard.set(name, forKey: "UserName")
-        UserDefaults.standard.set(showProjects, forKey: "UserProjects")
+        UserDefaults.standard.set(name.value, forKey: "UserName")
+        UserDefaults.standard.set(showProjects.value, forKey: "UserProjects")
     }
 }

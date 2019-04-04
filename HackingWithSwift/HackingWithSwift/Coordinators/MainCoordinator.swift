@@ -36,7 +36,6 @@ class MainCoordinator {
             fatalError("Unable to find SettingsViewController")
         }
         settingsViewController.user = user
-        settingsViewController.delegate = viewController
         navigationController.pushViewController(settingsViewController, animated: true)
     }
     

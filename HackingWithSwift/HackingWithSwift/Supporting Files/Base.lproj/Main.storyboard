@@ -24,14 +24,11 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="John Appleseed" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ijO-at-xDh">
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="John Appleseed" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="ijO-at-xDh" customClass="BoundTextField" customModule="HackingWithSwift" customModuleProvider="target">
                                 <rect key="frame" x="16" y="109" width="343" height="30"/>
                                 <nil key="textColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
-                                <connections>
-                                    <action selector="nameChanged:" destination="wgX-Va-f5F" eventType="editingChanged" id="5lm-Rp-MK9"/>
-                                </connections>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Show projects" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="gEq-H5-A2Q">
                                 <rect key="frame" x="16" y="155" width="343" height="21"/>
@@ -39,7 +36,7 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="lry-70-SbZ">
+                            <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="lry-70-SbZ" customClass="BoundSegmentedControl" customModule="HackingWithSwift" customModuleProvider="target">
                                 <rect key="frame" x="16" y="184" width="339" height="29"/>
                                 <segments>
                                     <segment title="All"/>
@@ -47,9 +44,6 @@
                                     <segment title="Apps"/>
                                     <segment title="Games"/>
                                 </segments>
-                                <connections>
-                                    <action selector="projectsChanged:" destination="wgX-Va-f5F" eventType="valueChanged" id="mNF-tS-M8W"/>
-                                </connections>
                             </segmentedControl>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

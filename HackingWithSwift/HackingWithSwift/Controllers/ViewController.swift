@@ -25,6 +25,11 @@ class ViewController: UITableViewController {
 
         setupView()
         loadProjects()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
         updatePreferences()
     }
 
@@ -40,14 +45,14 @@ class ViewController: UITableViewController {
     }
     
     private func updatePreferences() {
-        title = user.name
+        title = user.name.value
         
-        if user.showProjects == 0 {
+        if user.showProjects.value == 0 {
             // show all projects
             showingProjects = allProjects
         } else {
             // show only the project types they selected
-            showingProjects = allProjects.filter { $0.number % 3 == user.showProjects - 1 }
+            showingProjects = allProjects.filter { $0.number % 3 == user.showProjects.value! - 1 }
         }
         
         dataSource = TableViewDataSource(with: showingProjects)
@@ -57,14 +62,6 @@ class ViewController: UITableViewController {
     
     @objc private func showSettings() {
         coordinator?.showSettingsViewController(with: user, from: self)
-    }
-    
-    // MARK: - Public
-    
-    func updateUser(_ newUser: User) {
-        user = newUser
-        user.save()
-        updatePreferences()
     }
     
     // MARK: - Table View Delegate
