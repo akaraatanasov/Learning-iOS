@@ -10,9 +10,13 @@ import UIKit
 
 class DetailView: UIView {
 
+    // MARK: - Vars
+    
     var action: (()->())?
     
-    init(with project: Project, action: @escaping (()->())) {
+    // MARK: - Inits
+    
+    init(with project: Project, action: @escaping (() -> ())) {
         super.init(frame: .zero)
         self.action = action
         
@@ -81,7 +85,9 @@ class DetailView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    @objc func readButtonPressed() {
+    // MARK: - Private
+    
+    @objc private func readButtonPressed() {
         action?()
     }
 }

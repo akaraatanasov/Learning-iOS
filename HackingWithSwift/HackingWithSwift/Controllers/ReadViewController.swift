@@ -8,14 +8,20 @@
 import UIKit
 import WebKit
 
-class ReadViewController: UIViewController, WKNavigationDelegate {
+class ReadViewController: UIViewController {
+
+    // MARK: - Vars
+    
+    var delegate = WebViewDelegate()
+    
     var webView = WKWebView()
+    
     var project: Project!
-
-    let allowedSites = ["apple.com", "hackingwithswift.com"]
-
+    
+    // MARK: - Lifecycle
+    
     override func loadView() {
-        webView.navigationDelegate = self
+        webView.navigationDelegate = delegate
 
         view = webView
     }
@@ -34,19 +40,5 @@ class ReadViewController: UIViewController, WKNavigationDelegate {
         let request = URLRequest(url: url)
         webView.load(request)
     }
-
-    func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-        if let host = navigationAction.request.url?.host {
-            if allowedSites.contains(where: host.contains) {
-                decisionHandler(.allow)
-                return
-            }
-        }
-
-        if let url = navigationAction.request.url {
-            UIApplication.shared.open(url, options: [:])
-        }
-        
-        decisionHandler(.cancel)
-    }
+    
 }

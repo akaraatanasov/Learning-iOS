@@ -8,6 +8,9 @@
 import UIKit
 
 struct Project: Codable {
+    
+    // MARK: - Vars
+    
     var number: Int
     var title: String
     var subtitle: String
@@ -16,6 +19,8 @@ struct Project: Codable {
     var attributedText: NSAttributedString {
         return makeAttributedString(title: title, subtitle: subtitle)
     }
+    
+    // MARK: - Private
     
     private func makeAttributedString(title: String, subtitle: String) -> NSAttributedString {
         let titleAttributes = [NSAttributedString.Key.font: UIFont.preferredFont(forTextStyle: .headline), NSAttributedString.Key.foregroundColor: UIColor.purple]

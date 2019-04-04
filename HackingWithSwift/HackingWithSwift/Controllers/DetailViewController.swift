@@ -8,7 +8,12 @@
 import UIKit
 
 class DetailViewController: UIViewController {
+    
+    // MARK: - Vars
+    
     var project: Project!
+    
+    // MARK: - Lifecycle
     
     override func loadView() {
         let detailView = DetailView(with: project) { [weak self] in
@@ -29,6 +34,8 @@ class DetailViewController: UIViewController {
         title = "Project \(project.number)"
         Logger.log("Showed project \(project.number).")
     }
+    
+    // MARK: - Private
     
     private func showReadVC() {
         guard let readVC = storyboard?.instantiateViewController(withIdentifier: "ReadViewController") as? ReadViewController else {

@@ -8,11 +8,19 @@
 import UIKit
 
 class SettingsViewController: UIViewController {
+    
+    // MARK: - Vars
+    
+    weak var delegate: ViewController?
+    
+    var user: User!
+    
+    // MARK: - IBOutlets
+    
     @IBOutlet var name: UITextField!
     @IBOutlet var projects: UISegmentedControl!
-
-    weak var delegate: ViewController?
-    var user: User!
+    
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,6 +40,8 @@ class SettingsViewController: UIViewController {
 
         delegate?.updateUser(user)
     }
+    
+    // MARK: - IBActions
 
     @IBAction func nameChanged(_ sender: UITextField) {
         user?.name = sender.text ?? ""

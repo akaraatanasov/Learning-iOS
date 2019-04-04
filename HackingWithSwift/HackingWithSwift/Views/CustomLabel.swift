@@ -27,7 +27,9 @@ class CustomLabel: UILabel {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setupView() {
+    // MARK: - Private
+    
+    private func setupView() {
         translatesAutoresizingMaskIntoConstraints = false
         numberOfLines = 0
     }

@@ -8,13 +8,20 @@
 import UIKit
 
 class Logger {
+    
+    // MARK: - Vars
+    
     private static let sharedLogger = Logger()
 
     static var shared: Logger {
         return sharedLogger
     }
+    
+    // MARK: - Inits
 
     fileprivate init() { }
+    
+    // MARK: - Public
 
     func log(_ message: String) {
         print(message)
