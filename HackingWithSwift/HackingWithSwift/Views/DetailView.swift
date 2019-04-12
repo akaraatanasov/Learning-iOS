@@ -49,13 +49,13 @@ class DetailView: UIView {
         
         if project.number % 3 == 1 {
             let renderer = AppProjectRenderer(for: project)
-            imageView.image = renderer.drawTitleImage(for: .app)
+            imageView.image = renderer.drawTitleImage()
         } else if project.number % 3 == 2 {
             let renderer = GameProjectRenderer(for: project)
-            imageView.image = renderer.drawTitleImage(for: .game)
+            imageView.image = renderer.drawTitleImage()
         } else {
             let renderer = TechniqueProjectRenderer(for: project)
-            imageView.image = renderer.drawTitleImage(for: .technique)
+            imageView.image = renderer.drawTitleImage()
         }
         
         let titleLabel = CustomLabel(with: project.title, and: .largeTitle)

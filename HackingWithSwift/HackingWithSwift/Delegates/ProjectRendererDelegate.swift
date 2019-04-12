@@ -8,31 +8,32 @@
 
 import UIKit
 
-enum Renderer {
-    case app, game, technique
-}
-
 protocol ProjectRendererDelegate {
     var project: Project { get set }
     var colors: [UIColor] { get set }
+    var shadowColor: UIColor { get set }
+    var imageText: String { get set }
     
-    func drawTitleImage(for type: Renderer) -> UIImage
+    func drawTitleImage() -> UIImage
+    func renderAdditionalComponents(in context: UIGraphicsImageRendererContext)
 }
 
 extension ProjectRendererDelegate {
     
     // MARK: - Public
     
-    func drawTitleImage(for type: Renderer) -> UIImage {
+    func drawTitleImage() -> UIImage {
         if let cached = imageFromCache() {
             return cached
         }
         
-        let image = render(for: type)
+        let image = render()
         cache(image)
         
         return image
     }
+    
+    func renderAdditionalComponents(in context: UIGraphicsImageRendererContext) { }
     
     // MARK: - Private
     
@@ -44,7 +45,7 @@ extension ProjectRendererDelegate {
         return using.urls(for: directory, in: domainMask)
     }
     
-    private func render(for type: Renderer) -> UIImage {
+    private func render() -> UIImage {
         let format = UIGraphicsImageRendererFormat()
         format.scale = UIScreen.main.scale
         format.opaque = true
@@ -62,28 +63,14 @@ extension ProjectRendererDelegate {
             ctx.cgContext.drawLinearGradient(gradient, start: CGPoint.zero, end: CGPoint(x: 0, y: 200), options: [])
             
             let shadow = NSShadow()
-            switch type {
-            case .app: shadow.shadowColor = UIColor.blue
-            case .game: shadow.shadowColor = UIColor.green
-            case .technique: shadow.shadowColor = UIColor.purple
-            }
+            shadow.shadowColor = shadowColor
             shadow.shadowBlurRadius = 5
             
-            var text = "Project"
-            switch type {
-            case .app: text = "App Project"
-            case .game: text = "Game Project"
-            case .technique: text = "Technique Project"
-            }
             let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.white, .font: UIFont.systemFont(ofSize: 32, weight: .bold), .shadow: shadow]
-            let string = NSAttributedString(string: text, attributes: attributes)
+            let string = NSAttributedString(string: imageText, attributes: attributes)
             string.draw(at: CGPoint(x: 20, y: 150))
             
-            if type == .game, let image = UIImage(named: "dice") {
-                ctx.cgContext.translateBy(x: 300, y: 20)
-                ctx.cgContext.rotate(by: .pi / 4)
-                image.draw(in: CGRect(x: 0, y: 0, width: 100, height: 100), blendMode: .overlay, alpha: 1)
-            }
+            renderAdditionalComponents(in: ctx)
         }
     }
     

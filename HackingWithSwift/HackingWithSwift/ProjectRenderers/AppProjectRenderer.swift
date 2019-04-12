@@ -13,6 +13,8 @@ struct AppProjectRenderer: ProjectRendererDelegate {
     
     var project: Project
     var colors = [UIColor(red: 27/255.0, green: 215/255.0, blue: 253/255.0, alpha: 1), UIColor(red: 30/255.0, green: 98/255.0, blue: 241/255.0, alpha: 1)]
+    var shadowColor = UIColor.blue
+    var imageText = "App Project"
     
     // MARK: - Inits
     
